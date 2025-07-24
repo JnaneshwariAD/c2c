@@ -39,7 +39,7 @@ import Swal from 'sweetalert2';
 const columns = [
   { id: 'moduleId', label: 'ID' },
   { id: 'moduleName', label: 'Name', minWidth: 100 },
-  { id: 'description', label: 'Description', minWidth: 100 },
+  { id: 'description', label: 'Description', minWidth: 400 },
  
   { id: 'courseName', label: 'Course Name', minWidth: 150 },
  
@@ -131,7 +131,16 @@ const Modules = () => {
       const tableData = fetchedData.map((p) => ({
         moduleId: p.moduleId,
         moduleName: p.moduleName,
-        description: p.description,
+        // description: p.description,
+         description: (
+          <div style={{ 
+            textAlign: 'justify',
+            textJustify: 'inter-word',
+            whiteSpace: 'pre-line' 
+          }}>
+            {p.description}
+          </div>
+        ),
         semester: p.semester,
         courseName: p.courseDtoList?.map((course) => course.courseName).join(', ') || 'No course',
         url: p.url,
@@ -141,7 +150,9 @@ const Modules = () => {
         updatedDate: moment(p.updatedDate).format('L'),
         createdBy: p.createdBy ? p.createdBy.userName : 'No User',
         updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-      }));
+      }))
+                .sort((a, b) => a.moduleId - b.moduleId); // For ascending by ID
+      
       setModules(tableData);
     } catch (error) {
       console.error('Error fetching modules:', error);
@@ -798,7 +809,7 @@ console.log('Updating module with:', updatedDataPayload);
                 ref={inputRef}
                 onChange={onFileChange}
                 style={{ display: 'none' }}
-                accept="*/*"
+                accept="/"
               />
               <Button
                 variant="outlined"

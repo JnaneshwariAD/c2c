@@ -62,6 +62,15 @@ const AuthLogin = ({ ...others }) => {
 
   const handleLoginSubmit = (values, { setSubmitting, setErrors }) => {
     axios
+//     .post(API_URL, {
+//   userName: values.userName,
+//   password: values.password
+// }, {
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   withCredentials: false // Try with true if needed
+// })
       .post(API_URL, {
         userName: values.userName,
         password: values.password

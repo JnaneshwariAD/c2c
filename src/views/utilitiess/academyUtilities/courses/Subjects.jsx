@@ -41,9 +41,9 @@ const columns = [
   { id: 'description', label: 'Description' },
    { id: 'semester', label: 'Semester' },
 
-    { id: 'url', label: 'Url' },
-  { id: 'videoUrl', label: 'VideoUrl' },
-  { id: 'file', label: 'File', minWidth: 200 },
+  //   { id: 'url', label: 'Url' },
+  // { id: 'videoUrl', label: 'VideoUrl' },
+  // { id: 'file', label: 'File', minWidth: 200 },
 { id: 'createdBy', label: 'Created By', align: 'right' },
   { id: 'updatedBy', label: 'Updated By', align: 'right' },
   { id: 'insertedDate', label: 'Inserted Date', align: 'right' },
@@ -75,10 +75,10 @@ const Subjects = () => {
    const [userdata, setUserData] = useState({
       subjectName: '',
       description: '',
-      videoUrl: '',
-    url: '',
-    fileName: '',
-    filePath: null,
+    //   videoUrl: '',
+    // url: '',
+    // fileName: '',
+    // filePath: null,
     semester: [],
     });
   const [errors, setErrors] = useState({});
@@ -196,23 +196,24 @@ const fetchData = async () => {
         subjectName: p.subjectName,
         description: p.description,
         semester: p.semester,
-        videoUrl: p.videoUrl || '',
-        url: p.url || '',
-        fileName: p.fileName || '',
-        file: p.filePath
-          ? (
-            <img
-              src={ImageUrl + p.filePath}
-              alt={p.fileName}
-              style={{ width: 100, height: 50 }}
-            />
-          )
-          : 'NO FILE FOUND',
+        // videoUrl: p.videoUrl || '',
+        // url: p.url || '',
+        // fileName: p.fileName || '',
+        // file: p.filePath
+        //   ? (
+        //     <img
+        //       src={ImageUrl + p.filePath}
+        //       alt={p.fileName}
+        //       style={{ width: 100, height: 50 }}
+        //     />
+        //   )
+        //   : 'NO FILE FOUND',
         insertedDate: moment(p.insertedDate).format('L'),
         updatedDate: moment(p.updatedDate).format('L'),
         createdBy: p.createdBy?.userName || 'No User',
         updatedBy: p.updatedBy?.userName || 'No User',
-      }));
+      }))
+         .sort((a, b) => a.subjectId - b.subjectId); // For ascending by ID
 
       setSubjects(tableData);
       console.log('Fetched subjects:', fetchedData);
@@ -231,15 +232,10 @@ const fetchData = async () => {
   }
 };
 
-
-  
-
   const fileUploadHeaders = {
     'Content-Type': 'multipart/form-data',
     Authorization: 'Bearer ' + user.accessToken
   };
-
- 
 
   useEffect(() => {
     fetchData();
@@ -250,11 +246,11 @@ const validate = () => {
   const newErrors = {};
   if (!userdata.subjectName.trim()) newErrors.subjectName = 'Enter subject name';
   if (!userdata.description.trim()) newErrors.description = 'Enter description';
-  if (!userdata.semester || 
-      (Array.isArray(userdata.semester) && userdata.semester.length === 0) || 
-      (typeof userdata.semester === 'string' && userdata.semester.trim() === '')) {
-    newErrors.semester = 'Select at least one semester';
-  }
+  // if (!userdata.semester || 
+  //     (Array.isArray(userdata.semester) && userdata.semester.length === 0) || 
+  //     (typeof userdata.semester === 'string' && userdata.semester.trim() === '')) {
+  //   newErrors.semester = 'Select at least one semester';
+  // }
   return newErrors;
 };
 
@@ -272,7 +268,7 @@ const validate = () => {
         subjectName: userdata.subjectName,
         description: userdata.description,
         semester: userdata.semester,
-        videoUrl: userdata.videoUrl,
+        // videoUrl: userdata.videoUrl,
         courseCategoryDto: { categoryId: userdata.categoryId },
         createdBy: { userId: user.userId }
       };
@@ -513,10 +509,10 @@ const handleSubmit = async (e) => {
     const payload = {
       subjectName: userdata.subjectName,
       description: userdata.description,
-      url: userdata.url || null,
-      videoUrl: userdata.videoUrl || null,
-      fileName: userdata.fileName || null,
-      filePath: userdata.filePath || null,
+      // url: userdata.url || null,
+      // videoUrl: userdata.videoUrl || null,
+      // fileName: userdata.fileName || null,
+      // filePath: userdata.filePath || null,
       semester: Array.isArray(userdata.semester) ? userdata.semester : [userdata.semester],
       ...(editMode ? {
         subjectId: subjectId,
@@ -576,10 +572,10 @@ const handleEdit = (subject) => {
   setUserData({ 
     subjectName: subject.subjectName, 
     description: subject.description,
-    url: subject.url,
-    videoUrl: subject.videoUrl,
-    fileName: subject.fileName,
-    filePath: subject.filePath,
+    // url: subject.url,
+    // videoUrl: subject.videoUrl,
+    // fileName: subject.fileName,
+    // filePath: subject.filePath,
     semester: subject.semester
   });
   setEditMode(true);
@@ -652,9 +648,9 @@ const handleEdit = (subject) => {
                   <TableCell>{row.subjectName}</TableCell>
                   <TableCell>{row.description}</TableCell>
                   <TableCell>{row.semester} </TableCell>
-                  <TableCell>{row.url}</TableCell>
+                  {/* <TableCell>{row.url}</TableCell>
                   <TableCell>{row.videoUrl}</TableCell>
-                  <TableCell>{row.file}</TableCell>
+                  <TableCell>{row.file}</TableCell> */}
                   <TableCell align="right">{row.createdBy}</TableCell>
                   <TableCell align="right">{row.updatedBy}</TableCell>
                   <TableCell align="right">{row.insertedDate}</TableCell>
@@ -736,15 +732,15 @@ const handleEdit = (subject) => {
       <Grid item xs={12}>
   <TextField
     fullWidth
-    label="Semester (comma separated)"
+    label="Semester"
     name="semester"
     value={userdata.semester}
     onChange={(e) => setUserData({ 
       ...userdata, 
-      semester: e.target.value.split(',').map(s => s.trim()) 
+      // semester: e.target.value.split(',').map(s => s.trim()) 
     })}
     error={!!errors.semester}
-    helperText={errors.semester || "Enter semesters as comma separated values (e.g., 1,2,3)"}
+    // helperText={errors.semester || "Enter semesters as comma separated values (e.g., 1,2,3)"}
     sx={{
       '& .MuiOutlinedInput-root': {
         '&.Mui-focused fieldset': {
@@ -758,7 +754,7 @@ const handleEdit = (subject) => {
   />
 </Grid>
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <TextField
           fullWidth
           label="URL"
@@ -778,9 +774,9 @@ const handleEdit = (subject) => {
             },
           }}
         />
-      </Grid>
+      </Grid> */}
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <TextField
           fullWidth
           label="Video URL"
@@ -800,9 +796,9 @@ const handleEdit = (subject) => {
             },
           }}
         />
-      </Grid>
+      </Grid> */}
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <TextField
           fullWidth
           label="File Name"
@@ -830,24 +826,23 @@ const handleEdit = (subject) => {
               </Button>
             ),
           }}
-        />
+        /> */}
 
-        <input
-          type="file"
-          ref={inputRef}
-          onChange={onFileChange}
-          style={{ marginTop: '10px' }}
-          accept="*/*"
-        />
-        {isUploading && (
-          <Box sx={{ width: '100%', mt: 1 }}>
+        {/* <input */}
+          {/* type="file" */}
+          {/* ref={inputRef} */}
+          {/* onChange={onFileChange} */}
+          {/* style={{ marginTop: '10px' }} */}
+        {/* // /> */}
+        {/* {isUploading && ( */}
+          {/* <Box sx={{ width: '100%', mt: 1 }}>
             <LinearProgress variant="determinate" value={uploadProgress} />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <span>{uploadProgress}%</span>
             </Box>
           </Box>
         )}
-      </Grid>
+      </Grid> */}
 
       
     </Grid>

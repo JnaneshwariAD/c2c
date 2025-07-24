@@ -98,6 +98,28 @@ export const fetchModuleById = async (moduleId, headers) => {
 //   }
 // };
 
+// export const updatedModule = async (updatedData, headers) => {
+//   try {
+//     const res = await axios.put(`${BaseUrl}/module/v1/updateModule`, updatedData, {
+//       headers
+//     });
+//     console.log('API Response:', res.data);
+
+//     // Optional: handle feedback here, or in the calling function
+//     if (res.data.responseCode === 201) {
+//       console.log("Update Success:", res.data.message);
+//     } else if (res.data.responseCode === 400) {
+//       console.warn("Update Error:", res.data.errorMessage);
+//     }
+
+//     return res; // Return the result to the calling function
+
+//   } catch (error) {
+//     console.error("Update failed:", error.response?.data || error.message);
+//     throw error; // Important: rethrow so calling function can handle it
+//   }
+// };
+
 export const updatedModule = async (updatedData, headers) => {
   try {
     const res = await axios.put(`${BaseUrl}/module/v1/updateModule`, updatedData, {
@@ -119,7 +141,6 @@ export const updatedModule = async (updatedData, headers) => {
     throw error; // Important: rethrow so calling function can handle it
   }
 };
-
 
 // Delete module
 export const deleteModule = async (id, headers) => {

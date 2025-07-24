@@ -48,38 +48,40 @@ export const fetchCourses = async (headers) => {
   };
 
   // Add new course
-  export const addCourse = async (data, headers) => {
-    try {
-      const res = await axios({
-        method: 'POST',
-        url: `${BaseUrl}/category/v1/createCourse`,
-        headers,
-        data: JSON.stringify(data)
-      });
-  
-      if (res.data.responseCode === 201) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: res.data.message || 'Category added successfully!',
-        });
-      } else if (res.data.responseCode === 400) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: res.data.errorMessage || 'Something went wrong',
-        });
-      }
-  
-      return res;
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'An unexpected error occurred',
-      });
-    }
-  };
+// export const addCourse = async (data, headers) => {
+//   try {
+//     const res = await axios({
+//       method: 'POST',
+//       url: `${BaseUrl}/course/v1/createCourse`,
+//       headers,
+//       data: data  // ✅ Don't stringify manually
+//     });
+
+//     if (res.data.responseCode === 201) {
+//       Swal.fire({
+//         icon: 'success',
+//         title: 'Success',
+//         text: res.data.message || 'Course added successfully!',
+//       });
+//     } else {
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Error',
+//         text: res.data.errorMessage || 'Something went wrong',
+//       });
+//     }
+
+//     return res;
+//   } catch (error) {
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Error',
+//       text: error.message || 'An unexpected error occurred',
+//     });
+//     throw error; // ✅ Rethrow to let `postData` catch it
+//   }
+// };
+
   
 // export const addCourse = async (data, headers) => {
 //     return await axios({
@@ -128,7 +130,40 @@ export const fetchCourses = async (headers) => {
 //   }
 // };
 
- 
+export const addCourse = async (data, headers) => {
+  try {
+    // Log the request for debugging
+    console.log('Sending request to /course/v1/createCourse with:', {
+      data,
+      headers
+    });
+
+    const response = await axios.post(
+      `${BaseUrl}/course/v1/createCourse`,
+      data,
+      { 
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.error('API Error Details:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      headers: error.response?.headers,
+      request: error.request,
+      config: error.config
+    });
+    
+    // Throw a more descriptive error
+    throw new Error(`Failed to add course: ${error.response?.data?.message || error.message}`);
+  }
+};
 
 // export const addCourse = async (data, headers) => {
 //   try {
@@ -182,4 +217,17 @@ export const deleteCourse = async (id, headers) => {
     headers
   });
 };
+
+// export const deleteCourse = async (id, headers) => {
+//   try {
+//     const response = await axios.delete(
+//       `${BaseUrl}/course/v1/deleteCourseById/${id}`,
+//       { headers }
+//     );
+//     return response;
+//   } catch (error) {
+//     console.error('Delete course error:', error);
+//     throw error; // Re-throw to handle in the component
+//   }
+// };
 

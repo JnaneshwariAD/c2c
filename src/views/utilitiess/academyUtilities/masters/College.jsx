@@ -121,7 +121,8 @@ const College = () => {
           updatedDate: moment(p.updatedDate).format('L'),
           createdBy: p.createdBy ? p.createdBy.userName : 'No User',
           updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-        }));
+        }))
+         .sort((a, b) => a.collegeId - b.collegeId); // For ascending by ID
         setCourses(tableData);
       } else {
         setCourses([]);

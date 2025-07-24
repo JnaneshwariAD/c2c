@@ -37,10 +37,10 @@ import Swal from 'sweetalert2';
 const columns = [
   { id: 'topicId', label: 'ID' },
   { id: 'topicName', label: 'Name', minWidth: 150 },
-  { id: 'description', label: 'Description', minWidth: 400 },
+  { id: 'description', label: 'Description', minWidth: 450 },
   { id: 'moduleName', label: 'Module', minWidth: 150 },
-  { id: 'url', label: 'Url' },
-  { id: 'videoUrl', label: 'VideoUrl' },
+  // { id: 'url', label: 'Url' },
+  { id: 'videoUrl', label: 'Upload Content Video' },
   { id: 'file', label: 'File' , minWidth:200 },
   { id: 'createdBy', label: 'Created By', align: 'right' },
   { id: 'updatedBy', label: 'Updated By', align: 'right' },
@@ -89,7 +89,16 @@ const AcademyTopics = () => {
         const tableData = fetchedData.map((p) => ({
           topicId: p.topicId,
           topicName: p.topicName,
-          description: p.description,
+          // description: p.description,
+          description: (
+          <div style={{ 
+            textAlign: 'justify',
+            textJustify: 'inter-word',
+            whiteSpace: 'pre-line' 
+          }}>
+            {p.description}
+          </div>
+        ),
           moduleName: p.moduleDtoList ? p.moduleDtoList.moduleName : 'No Module Name',
           url: p.url,
           videoUrl: p.videoUrl,
@@ -102,7 +111,9 @@ const AcademyTopics = () => {
           updatedDate: moment(p.updatedDate).format('L'),
           createdBy: p.createdBy ? p.createdBy.userName : 'No User',
           updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-        }));
+        }))
+                .sort((a, b) => a.topicId - b.topicId); // For ascending by ID
+
         setTopics(tableData);
       } else {
         setTopics([]);
@@ -447,11 +458,38 @@ const AcademyTopics = () => {
               })}
             </TableBody> */}
 
-            <TableBody>
+            {/* <TableBody>
   {topics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((topic, index) => {
     return (
       <TableRow hover role="checkbox" tabIndex={-1} key={topic.topicId}>
         <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+        <TableCell>{topic.topicName}</TableCell>
+        <TableCell>{topic.description}</TableCell>
+        <TableCell>{topic.moduleName}</TableCell>
+        <TableCell>{topic.url}</TableCell>
+        <TableCell>{topic.videoUrl}</TableCell>
+        <TableCell>{topic.file}</TableCell>
+        <TableCell align="right">{topic.createdBy}</TableCell>
+        <TableCell align="right">{topic.updatedBy}</TableCell>
+        <TableCell align="right">{topic.insertedDate}</TableCell>
+        <TableCell align="right">{topic.updatedDate}</TableCell>
+        <TableCell align="right">
+          <IconButton onClick={() => handleEdit(topic.topicId)} sx={{ color: "#03045E" }} size="small">
+            <Edit />
+          </IconButton>
+          <IconButton onClick={() => deleteData(topic.topicId)} color="error" size="small">
+            <DeleteForever />
+          </IconButton>
+        </TableCell>
+      </TableRow>
+    );
+  })}
+</TableBody> */}
+<TableBody>
+  {topics.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((topic) => {
+    return (
+      <TableRow hover role="checkbox" tabIndex={-1} key={topic.topicId}>
+        <TableCell>{topic.topicId}</TableCell>
         <TableCell>{topic.topicName}</TableCell>
         <TableCell>{topic.description}</TableCell>
         <TableCell>{topic.moduleName}</TableCell>
@@ -578,10 +616,10 @@ const AcademyTopics = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="VideoUrl "
+                label="Upload Content Video "
                 name="videoUrl"
                 value={userdata.videoUrl}
                 onChange={changeHandler}
@@ -598,8 +636,42 @@ const AcademyTopics = () => {
                   },
                 }}
               />
-            </Grid>
+            </Grid> */}
+<Grid item xs={12}>
+              <TextField
+                margin="normal"
+                fullWidth
+                id="videoUrl"
+                label="Upload Content Video"
+                name="fileName"
+                value={userdata.videoUrl}
+                disabled
+                helperText={errors.videoUrl}
+                error={!!errors.videoUrl}
+                InputProps={{
+                  endAdornment: (
+                    <Button variant="contained" color="primary" onClick={onFileUpload} sx={{
+                      backgroundColor: "#03045E",
+                      '&:hover': {
+                        backgroundColor: "#03045E",
+                        opacity: 0.9
+                      }
+                    }}>
+                      Upload
+                    </Button>
+                  )
+                }}
+              />
 
+              <input
+                type="file"
+                onChange={onFileChange}
+                ref={inputRef}
+                style={{ marginTop: 20 }}
+                accept="application/*"
+              />
+            </Grid>
+------------
             <Grid item xs={12}>
               <TextField
                 margin="normal"

@@ -20,6 +20,7 @@ import axios from 'axios';
 import { DeleteForever, Edit } from '@mui/icons-material';
 import { addUniversity, deleteUniversity, fetchUniversities, getUniveristy_ById, updatedUniversity } from 'views/API/UniversityApi';
 import Swal from 'sweetalert2';
+import { minHeight, minWidth } from '@mui/system';
 
 
 
@@ -28,7 +29,7 @@ import Swal from 'sweetalert2';
 
 const columns = [
   { id: 'universityId', label: 'ID', align: 'center' },
-  {id:'universitycode' , label:"University Code", align:'center'},
+  // {id:'universitycode' , label:"University Code", align:'center'},
   { id: 'universityName', label: 'Name', align: 'center' },
   { id: 'description', label: 'Description', minWidth: 100 },
   { id: 'file', label: 'File', align: 'center' },
@@ -49,7 +50,7 @@ const University = () => {
   const [userdata, setUserData] = useState({
     universityName: '',
     description: '',
-    universityCode: '',
+    // universityCode: '',
     universityPicName:''
   });
   const [errors, setErrors] = useState({});
@@ -97,7 +98,9 @@ const University = () => {
           updatedDate: moment(p.updatedDate).format('L'),
           createdBy: p.createdBy ? p.createdBy.userName : 'No User',
           updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-        }));
+        }))
+                .sort((a, b) => a.universityId - b.universityId); // For ascending by ID
+        
         setAdvertisement(tableData);
       } else {
         setAdvertisement([]);
@@ -168,7 +171,7 @@ const University = () => {
           universityName: '',
           description: '',
           universityPicName: '',
-          universityCode: det.universityCode || ''
+          // universityCode: det.universityCode || ''
         });
       } else {
         alert(response.data.errorMessage);
@@ -248,9 +251,9 @@ const University = () => {
       newErrors.universityPicName = 'Select the file';
     }
 
-    if (!userdata.universityCode || userdata.universityCode.trim() === '') {
-  newErrors.universityCode = 'Enter the university code';
-}
+//     if (!userdata.universityCode || userdata.universityCode.trim() === '') {
+//   newErrors.universityCode = 'Enter the university code';
+// }
 
     return newErrors;
   };
@@ -408,7 +411,7 @@ const handleDelete = async (universityId) => {
           
           <Grid container spacing={2}>
 
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
   <TextField
     fullWidth
     label="University Code"
@@ -428,7 +431,7 @@ const handleDelete = async (universityId) => {
       },
     }}
   />
-</Grid>
+</Grid> */}
 
         
             <Grid item xs={12}>
