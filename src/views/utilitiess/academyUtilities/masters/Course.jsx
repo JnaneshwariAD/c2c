@@ -101,15 +101,12 @@ const UpSkillCourses = () => {
   };
 
  const user = JSON.parse(sessionStorage.getItem('user'));
- console.log(user);
+ console.log("user : "+user);
  
   const headers = {
     'Content-type': 'application/json',
     Authorization: 'Bearer ' + user?.accessToken
   };
-  
-  
-
 
   const fetchCategories = async () => {
     try {
@@ -718,6 +715,8 @@ const handleDelete = async (courseId) => {
                 }}
               />
             </Grid>
+
+            {/* categoryId */}
             <Grid item xs={12}>
               <FormControl fullWidth sx={{
                 mb: 2, '& .MuiOutlinedInput-root': {
@@ -745,6 +744,8 @@ const handleDelete = async (courseId) => {
                 </Select>
               </FormControl>
             </Grid>
+
+            {/* universityId */}
             <Grid item xs={12}>
               <FormControl fullWidth sx={{
                 mb: 2, '& .MuiOutlinedInput-root': {
@@ -905,6 +906,8 @@ const handleDelete = async (courseId) => {
                 }}
               />
             </Grid> */}
+
+            {/* activePeriod */}
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -926,6 +929,8 @@ const handleDelete = async (courseId) => {
                 }}
               />
             </Grid>
+
+            {/* Trail Period */}
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -947,6 +952,8 @@ const handleDelete = async (courseId) => {
                 }}
               />
             </Grid>
+
+            {/* semester */}
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -969,6 +976,7 @@ const handleDelete = async (courseId) => {
               />
             </Grid>
 
+            {/* VideoUrl */}
             <Grid item xs={12}>
               <TextField
                 fullWidth

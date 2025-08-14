@@ -40,8 +40,8 @@ const columns = [
   { id: 'description', label: 'Description', minWidth: 450 },
   { id: 'moduleName', label: 'Module', minWidth: 150 },
   // { id: 'url', label: 'Url' },
-  { id: 'videoUrl', label: 'Upload Content Video' },
-  { id: 'file', label: 'File' , minWidth:200 },
+  { id: 'videoUrl', label: 'Upload Context Video' },
+  { id: 'file', label: 'Upload Pdf' , minWidth:200 },
   { id: 'createdBy', label: 'Created By', align: 'right' },
   { id: 'updatedBy', label: 'Updated By', align: 'right' },
   { id: 'insertedDate', label: 'Inserted Date', align: 'right' },
@@ -637,47 +637,12 @@ const AcademyTopics = () => {
                 }}
               />
             </Grid> */}
-<Grid item xs={12}>
+<Grid item xs={12} >
               <TextField
                 margin="normal"
                 fullWidth
-                id="videoUrl"
-                label="Upload Content Video"
-                name="fileName"
-                value={userdata.videoUrl}
-                disabled
-                helperText={errors.videoUrl}
-                error={!!errors.videoUrl}
-                InputProps={{
-                  endAdornment: (
-                    <Button variant="contained" color="primary" onClick={onFileUpload} sx={{
-                      backgroundColor: "#03045E",
-                      '&:hover': {
-                        backgroundColor: "#03045E",
-                        opacity: 0.9
-                      }
-                    }}>
-                      Upload
-                    </Button>
-                  )
-                }}
-              />
-
-              <input
-                type="file"
-                onChange={onFileChange}
-                ref={inputRef}
-                style={{ marginTop: 20 }}
-                accept="application/*"
-              />
-            </Grid>
-------------
-            <Grid item xs={12}>
-              <TextField
-                margin="normal"
-                fullWidth
-                id="fileName"
-                label="File Name"
+                id="file"
+                label="Upload pdf"
                 name="fileName"
                 value={userdata.fileName}
                 disabled
@@ -703,7 +668,42 @@ const AcademyTopics = () => {
                 onChange={onFileChange}
                 ref={inputRef}
                 style={{ marginTop: 20 }}
-                accept="application/*"
+                accept="application/pdf"
+              />
+            </Grid>
+{/* ------------ */}
+            <Grid item xs={12}>
+              <TextField
+                margin="normal"
+                fullWidth
+                id="fileName"
+                label="Upload Context Video"
+                name="fileName"
+                value={userdata.fileName}
+                disabled
+                helperText={errors.fileName}
+                error={!!errors.fileName}
+                InputProps={{
+                  endAdornment: (
+                    <Button variant="contained" color="primary" onClick={onFileUpload} sx={{
+                      backgroundColor: "#03045E",
+                      '&:hover': {
+                        backgroundColor: "#03045E",
+                        opacity: 0.9
+                      }
+                    }}>
+                      Upload
+                    </Button>
+                  )
+                }}
+              />
+
+              <input
+                type="file"
+                onChange={onFileChange}
+                ref={inputRef}
+                style={{ marginTop: 20 }}
+                 accept="video/mp4, video/x-m4v"
               />
             </Grid>
 

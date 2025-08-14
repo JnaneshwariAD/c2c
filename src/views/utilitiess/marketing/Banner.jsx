@@ -51,6 +51,10 @@ const Banner = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [advertisementId, setAdvertisementId] = useState(null);
+
+      const [isUploading, setIsUploading] = useState(false);
+    
+  
   const inputRef = useRef(null);
 
   const handleChangePage = (event, newPage) => {
@@ -133,54 +137,139 @@ const Banner = () => {
     }
   };
 
+   const fileUploadHeaders = {
+    'Content-Type': 'multipart/form-data',
+    Authorization: 'Bearer ' + user.accessToken
+  };
+   const onFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+      setUserData({
+        ...userdata,
+        fileName: e.target.files[0].name
+      });
+    }
+  };
+
   const onFileUpload = async (e) => {
     e.preventDefault();
     if (!selectedFile) {
-      setFileError('Please select a file');
+      Swal.fire({
+        icon: 'error',
+        title: 'No file selected',
+        text: 'Please select a file to upload',
+        confirmButtonColor: theme.palette.primary.main
+      });
       return;
     }
 
-    const data = new FormData();
-    data.append('file', selectedFile);
+    const formData = new FormData();
+    formData.append('file', selectedFile);
 
     try {
-      const res = await axios.post(`${BaseUrl}/file/uploadFile`, data, {
-        headers: {
-          'content-type': 'multipart/form-data',
-          Authorization: 'Bearer ' + user.accessToken
+      setIsUploading(true);
+      Swal.fire({
+        title: 'Uploading file...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
         }
       });
 
-      setFileName(res.data.fileName);
-      setUserData({ ...userdata, fileName: res.data.fileName });
-      setFileError('');
-
-
-      Swal.fire({
-        target: document.getElementById("your-dialog-id"),
-        icon: 'success',
-        title: 'Upload Successful',
-        text: res.data.message || 'Your file has been uploaded successfully.',
-        timer: 2500,
-        showConfirmButton: false
+      const res = await axios.post(`${BaseUrl}/file/uploadFile`, formData, {
+        headers: fileUploadHeaders,
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(progress);
+        }
       });
-    } catch (err) {
-      console.error('Error uploading file:', err);
 
+      Swal.close();
+
+      if (res.status === 200) {
+        setUserData(prev => ({
+          ...prev,
+          fileName: res.data.fileName,
+          filePath: res.data.filePath
+        }));
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'File uploaded successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } else {
+        throw new Error(res.data.errorMessage || 'File upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Upload Failed',
-        text: err?.response?.data?.errorMessage || 'Something went wrong during file upload.',
-        confirmButtonColor: '#d33'
+        title: 'Upload error',
+        text: error.message || 'An error occurred while uploading the file',
+        confirmButtonColor: theme.palette.primary.main
       });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
+  // const onFileUpload = async (e) => {
+  //   e.preventDefault();
+  //   if (!selectedFile) {
+  //     setFileError('Please select a file');
+  //     return;
+  //   }
+
+  //   const data = new FormData();
+  //   data.append('file', selectedFile);
+
+  //   try {
+  //     const res = await axios.post(`${BaseUrl}/file/uploadFile`, data, {
+  //       headers: {
+  //         'content-type': 'multipart/form-data',
+  //         Authorization: 'Bearer ' + user.accessToken
+  //       }
+  //     });
+
+  //     setFileName(res.data.fileName);
+  //     setUserData({ ...userdata, fileName: res.data.fileName });
+  //     setFileError('');
 
 
-  const onFileChange = (e) => {
-    setFileName(e.target.files[0].name);
-    setSelectedFile(e.target.files[0]);
-  };
+  //     Swal.fire({
+  //       target: document.getElementById("your-dialog-id"),
+  //       icon: 'success',
+  //       title: 'Upload Successful',
+  //       text: res.data.message || 'Your file has been uploaded successfully.',
+  //       timer: 2500,
+  //       showConfirmButton: false
+  //     });
+  //   } catch (err) {
+  //     console.error('Error uploading file:', err);
+
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Upload Failed',
+  //       text: err?.response?.data?.errorMessage || 'Something went wrong during file upload.',
+  //       confirmButtonColor: '#d33'
+  //     });
+  //   }
+  // };
+
+
+  // const onFileChange = (e) => {
+  //   setFileName(e.target.files[0].name);
+  //   setSelectedFile(e.target.files[0]);
+  // };
+
+  
+  // const onFileChange = (e) => {
+  //   const selectedFile = e.target.files[0];
+  //   setSelectedFile(selectedFile);
+  //   setFileName(selectedFile ? selectedFile.name : '');
+  // };
 
   const validateForm = () => {
     const newErrors = {};

@@ -32,7 +32,7 @@ const columns = [
   // {id:'universitycode' , label:"University Code", align:'center'},
   { id: 'universityName', label: 'Name', align: 'center' },
   { id: 'description', label: 'Description', minWidth: 100 },
-  { id: 'file', label: 'File', align: 'center' },
+  { id: 'file', label: 'Upload Logo', align: 'center' },
   { id: 'createdBy', label: 'Created By', align: 'center' },
   { id: 'updatedBy', label: 'Updated By', align: 'center' },
   { id: 'insertedDate', label: 'Inserted Date', align: 'center' },

@@ -2,6 +2,7 @@
   "name": "colleg2company-admin",
   "version": "3.5.0",
   "private": true,
+  "proxy": "https://wsproducts.cloudjiffy.net/wsc2clmsadmin",
   "author": {
     "name": "Colleg2Company Admin",
     "email": "CodedThemes@gmail.com",
