@@ -573,7 +573,7 @@ const AcademyTopics = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <FormControl fullWidth error={!!errors.moduleId} sx={{
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
@@ -595,7 +595,7 @@ const AcademyTopics = () => {
                 <FormHelperText>{errors.moduleId}</FormHelperText>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Url "
@@ -637,7 +637,7 @@ const AcademyTopics = () => {
                 }}
               />
             </Grid> */}
-<Grid item xs={12} >
+<Grid item xs={12} md={6}>
               <TextField
                 margin="normal"
                 fullWidth
@@ -672,7 +672,7 @@ const AcademyTopics = () => {
               />
             </Grid>
 {/* ------------ */}
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 margin="normal"
                 fullWidth
