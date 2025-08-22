@@ -1,90 +1,3 @@
-// import axios from "axios";
-// import { BaseUrl } from "BaseUrl";
-
-// // candidates
-// export const fetchCandidates = async (headers) => {
-//   return await axios({
-//     method: 'GET',
-//     url: `${BaseUrl}/candidate/v1/getAllCandidatesByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
-//     headers: headers
-//   });
-// };
-
-// // export const addCandidate = async (headers, cdata) => {
-// //   try {
-// //     await axios({
-// //       method: "POST",
-// //       url: `${BaseUrl}/candidate/v1/createCandidate`,
-// //       headers,
-// //       data: cdata,
-// //     }).then(function (res) {
-// //       if (res.data.responseCode === 201) {
-// //         alert(res.data.message);
-// //       } else if (res.data.responseCode === 400) {
-// //         alert(res.data.errorMessage);
-// //       }
-// //     });
-// //   } catch (error) {
-// //     alert(error);
-// //   }
-// // };
-
-// export const addCandidate = async (cdata, headers) => {
-//   return await axios({
-//     method: "POST",
-//     url: `${BaseUrl}/candidate/v1/createCandidate`,
-//     headers,
-//     data: cdata,
-//   });
-// };
-
-
-// export const getCandidateById = async (id, headers) => {
-//   return await axios({
-//     method: "GET",
-//     url: `${BaseUrl}/candidate/v1/getCandidateByMobileUserId/{mobileUserId}?mobileUserId=${id}`,
-//     headers: headers,
-//   });
-// };
-
-// export const updateCandidates = async (updatedData, headers) => {
-//   console.log(updatedData);
-//   return await axios({
-//     method: "PUT",
-//     url: `${BaseUrl}/candidate/v1/updateCandidate`,
-//     headers: headers,
-//     data: updatedData,
-//   })
-//     .then(function (res) {
-//       console.log(res);
-//       if (res.data.responseCode === 201) {
-//         alert(res.data.message);
-//       } else if (res.data.responseCode === 400) {
-//         alert(res.data.errorMessage);
-//       }
-//     })
-//     .catch(function (error) {
-//       console.log(error);
-//     });
-// };
-
-// export const deleteCandidate = async (id, headers) => {
-//   return await axios({
-//     method: 'delete',
-//     url: `${BaseUrl}/candidate/v1/deleteCandidateById/{mobileUserId}?mobileUserId/${id}`,
-//     headers
-//   })
-//     .then((res) => {
-//       if (res.data.responseCode === 200) {
-//         alert(res.data.message);
-//       } else if (res.data.responseCode === 400) {
-//         alert(res.data.errorMessage);
-//       }
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
 
 import axios from "axios";
 import { BaseUrl } from "BaseUrl";
@@ -101,7 +14,7 @@ import Swal from "sweetalert2";
 export const fetchCandidates = async (headers) => {
   return await axios({
     method: 'GET',
-    url: `${BaseUrl}/candidate/v1/getAllCandidatesByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+    url: `${BaseUrl}/candidate/v1/getAllCandidatesByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
     headers: headers
     
   });
@@ -241,6 +154,4 @@ export const deleteCandidate = async (mobileUserId, headers) => {
     throw error;
   }
 };
-
-
-
+ 

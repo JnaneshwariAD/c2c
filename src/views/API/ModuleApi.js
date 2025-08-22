@@ -6,7 +6,7 @@ import { BaseUrl } from "BaseUrl";
 export const fetchModules = async (headers) => {
   return await axios({
     method: 'GET',
-    url: `${BaseUrl}/module/v1/getAllModuleByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+    url: `${BaseUrl}/module/v1/getAllModuleByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
     headers: headers
   });
 };

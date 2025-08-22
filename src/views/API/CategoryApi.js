@@ -8,7 +8,7 @@ import { BaseUrl } from 'BaseUrl';
 export const fetchCategories = async (headers) => {
   return await axios({
     method: 'GET',
-    url: `${BaseUrl}/category/v1/getAllCategoryByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+    url: `${BaseUrl}/category/v1/getAllCategoryByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
     headers: headers
   });
 };

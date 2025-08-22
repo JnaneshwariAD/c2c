@@ -7,7 +7,7 @@ import { BaseUrl } from 'BaseUrl';
 export const fetchCollege = async (headers) => {
   return await axios({
     method: 'GET',
-    url: `${BaseUrl}/college/v1/getAllCollegesByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+    url: `${BaseUrl}/college/v1/getAllCollegesByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
     headers: headers
   });
 };

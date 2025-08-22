@@ -1104,30 +1104,488 @@
 // export default Candidate;
 
 
+// import * as React from 'react';
+// import Paper from '@mui/material/Paper';
+// import Table from '@mui/material/Table';
+// import TableBody from '@mui/material/TableBody';
+// import TableCell from '@mui/material/TableCell';
+// import TableContainer from '@mui/material/TableContainer';
+// import TableHead from '@mui/material/TableHead';
+// import TablePagination from '@mui/material/TablePagination';
+// import TableRow from '@mui/material/TableRow';
+// import Grid from '@mui/material/Grid';
+// import { useTheme } from '@mui/material/styles';
+// import MainCard from 'ui-component/cards/MainCard';
+// import { gridSpacing } from 'store/constant';
+// import { useState, useEffect } from 'react';
+// import moment from 'moment';
+// import { Box, Button, Dialog, DialogActions, DialogTitle, TextField, IconButton, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+// import AddIcon from '@mui/icons-material/Add';
+// import { DeleteForever, Edit } from '@mui/icons-material';
+// import { fetchCandidates,getCandidateById, addCandidate, deleteCandidate , updateCandidates} from '../../../API/CandidatesApi';
+// import Swal from 'sweetalert2';
+
+// const columns = [
+//   // { id: 'id', label: 'Id', minWidth: 120 },
+
+//   { id: 'fullName', label: 'Full Name', minWidth: 120 },
+//   { id: 'userName', label: 'Username', minWidth: 100 },
+//   { id: 'gender', label: 'Gender', minWidth: 80 },
+//   { id: 'mailId', label: 'Email', minWidth: 150 },
+//   { id: 'mobileNumber', label: 'Mobile Number', minWidth: 120 },
+//   { id: 'otp', label: 'OTP', minWidth: 100 },
+//   { id: 'password', label: 'Password', minWidth: 100 },
+//   { id: 'profilePicName', label: 'Profile Pic Name', minWidth: 150 },
+//   { id: 'profilePicPath', label: 'Profile Pic Path', minWidth: 150 },
+//   { id: 'insertedDate', label: 'Inserted Date', align: 'right' },
+//   { id: 'updatedDate', label: 'Updated Date', align: 'right' },
+//   { id: 'lastLogin', label: 'Last Login', align: 'right' },
+//   { id: 'lastView', label: 'Last View', align: 'right' },
+//   { id: 'actions', label: 'Actions', align: 'right' }
+// ];
+
+// const Candidates = () => {
+//   const theme = useTheme();
+//   const [page, setPage] = useState(0);
+//   const [rowsPerPage, setRowsPerPage] = useState(10);
+//   const [candidates, setCandidates] = useState([]);
+//   const [open, setOpen] = useState(false);
+//   const [editMode, setEditMode] = useState(false);
+//   const [userdata, setUserData] = useState({
+//     fullName: '',
+//     userName: '',
+//     gender: '',
+//     mailId: '',
+//     mobileNumber: '',
+//     otp: '',
+//     password: '',
+//     profilePicName: '',
+//     profilePicPath: ''
+//   });
+//   const [errors, setErrors] = useState({});
+//   const [refreshTrigger, setRefreshTrigger] = useState(false);
+//   // const [candidateId, setCandidateId] = useState(null);
+//   const [mobileUserId, setmobileUserId] = useState(null);
+
+//   const handleChangePage = (event, newPage) => setPage(newPage);
+//   const handleChangeRowsPerPage = (event) => {
+//     setRowsPerPage(+event.target.value);
+//     setPage(0);
+//   };
+
+//   const user = JSON.parse(sessionStorage.getItem('user'));
+//   const headers = {
+//     'Content-type': 'application/json',
+//     Authorization: 'Bearer ' + user.accessToken
+//   };
+
+//   const FetchData = async () => {
+//     try {
+//       const res = await fetchCandidates(headers);
+//       const fetchedData = res.data.content || [];
+
+//       const tableData = fetchedData.map((p) => ({
+//         mobileUserId: p.mobileUserId,
+//         fullName: p.fullName,
+//         userName: p.userName,
+//         gender: p.gender,
+//         mailId: p.mailId,
+//         mobileNumber: p.mobileNumber,
+//         otp: p.otp,
+//         password: p.password,
+//         profilePicName: p.profilePicName,
+//         profilePicPath: p.profilePicPath,
+//         insertedDate: p.insertedDate ? moment(p.insertedDate).format('L') : '',
+//         updatedDate: p.updatedDate ? moment(p.updatedDate).format('L') : '',
+//         lastLogin: p.lastLogin ? moment(p.lastLogin).format('L') : '',
+//         lastView: p.lastView ? moment(p.lastView).format('L') : ''
+//       }));
+
+//       setCandidates(tableData);
+//     } catch (error) {
+//       console.error('Error fetching candidates:', error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     FetchData();
+//   }, [refreshTrigger]);
+
+//   const validateForm = () => {
+//     const newErrors = {};
+//     if (!userdata.fullName) newErrors.fullName = 'Enter full name';
+//     if (!userdata.userName) newErrors.userName = 'Enter username';
+//     if (!userdata.gender) newErrors.gender = 'Select gender';
+//     if (!userdata.mailId) newErrors.mailId = 'Enter email';
+//     if (!userdata.mobileNumber) newErrors.mobileNumber = 'Enter mobile number';
+//     return newErrors;
+//   };
+
+//   const changeHandler = (e) => {
+//     setUserData({
+//       ...userdata,
+//       [e.target.name]: e.target.value
+//     });
+//     setErrors({ ...errors, [e.target.name]: null });
+//   };
+
+//   const handleAdd = () => {
+//     setEditMode(false);
+//     setUserData({
+//       fullName: '',
+//       userName: '',
+//       gender: '',
+//       mailId: '',
+//       mobileNumber: '',
+//       otp: '',
+//       password: '',
+//       profilePicName: '',
+//       profilePicPath: ''
+//     });
+//     setOpen(true);
+//   };
+
+//   // const handleEdit = async (id) => {
+//   //   setEditMode(true);
+//   //   setOpen(true);
+//   //   try {
+//   //     const res = await getCandidateById(id, headers);
+//   //     const det = res.data;
+//   //     setCandidates(det.mobileUserId);
+//   //     setUserData({
+//   //       fullName: det.fullName || '',
+//   //       userName: det.userName || '',
+//   //       gender: det.gender || '',
+//   //       mailId: det.mailId || '',
+//   //       mobileNumber: det.mobileNumber || '',
+//   //       otp: det.otp || '',
+//   //       password: det.password || '',
+//   //       profilePicName: det.profilePicName || '',
+//   //       profilePicPath: det.profilePicPath || ''
+//   //     });
+//   //   } catch (error) {
+//   //     console.error('Error fetching candidate details:', error);
+//   //   }
+//   // };
+
+//   // const handleDelete = async (id) => {
+//   //   try {
+//   //     await deleteCandidate(id, headers);
+//   //     FetchData();
+//   //   } catch (error) {
+//   //     console.error('Error deleting candidate:', error);
+//   //   }
+//   // };
+ 
+
+
+// // const handleDelete = async (id) => {
+// //   try {
+// //     const data = await deleteCandidate(id, headers);
+// //     if (data.responseCode === 200) {
+// //       // maybe show success notification here
+// //       FetchData();
+// //     } else {
+// //       console.error('Delete failed:', data.message);
+// //       // optionally show error notification here
+// //     }
+// //   } catch (error) {
+// //     console.error('Error deleting candidate:', error);
+// //     // optionally show error notification here
+// //   }
+// // };
+// const handleEdit = async (id) => {
+//   setEditMode(true);
+//   setOpen(true);
+//   try {
+//     const res = await getCandidateById(id, headers);
+//     const det = res.data;
+
+//     // ✅ store the ID for update
+//     setmobileUserId(det.mobileUserId);
+
+//     setUserData({
+//       fullName: det.fullName || '',
+//       userName: det.userName || '',
+//       gender: det.gender || '',
+//       mailId: det.mailId || '',
+//       mobileNumber: det.mobileNumber || '',
+//       otp: det.otp || '',
+//       password: det.password || '',
+//       profilePicName: det.profilePicName || '',
+//       profilePicPath: det.profilePicPath || ''
+//     });
+//   } catch (error) {
+//     console.error('Error fetching candidate details:', error);
+//   }
+// };
+
+
+// const handleDelete = async (mobileUserId) => {
+//   const result = await Swal.fire({
+//     title: "Are you sure?",
+//     text: "This candidate will be permanently deleted.",
+//     icon: "warning",
+//     showCancelButton: true,
+//     confirmButtonColor: "#d33",
+//     cancelButtonColor: "#3085d6",
+//     confirmButtonText: "Yes, delete it!"
+//   });
+
+//   if (result.isConfirmed) {
+//     try {
+//       const data = await deleteCandidate(mobileUserId, headers);
+
+//       if (data?.responseCode === 200) {
+//         // Remove candidate from state instantly for faster UI
+//         setCandidates(prev => prev.filter(c => c.mobileUserId !== mobileUserId));
+
+//         Swal.fire({
+//           icon: "success",
+//           title: "Deleted!",
+//           text: data.message || "Candidate deleted successfully.",
+//           timer: 1500,
+//           showConfirmButton: false
+//         });
+//       } else {
+//         Swal.fire({
+//           icon: "error",
+//           title: "Error",
+//           text: data.message || "Failed to delete candidate"
+//         });
+//       }
+//     } catch (error) {
+//       Swal.fire({
+//         icon: "error",
+//         title: "Error",
+//         text: error.response?.data?.message || "An error occurred while deleting the candidate"
+//       });
+//     }
+//   }
+// };
+
+//   // const postData = async (e) => {
+//   //   e.preventDefault();
+//   //   const validationErrors = validateForm();
+//   //   if (Object.keys(validationErrors).length > 0) {
+//   //     setErrors(validationErrors);
+//   //     return;
+//   //   }
+//   //   const now = new Date().toISOString();
+//   //   const dataToPost = {
+//   //     ...userdata,
+//   //     insertedDate: now,
+//   //     updatedDate: now,
+//   //     lastLogin: now,
+//   //     lastView: now,
+//   //     mobileUserId: 0,
+//   //     createdBy: { userId: user.userId }
+//   //   };
+//   //   try {
+//   //     const response = await addCandidate(dataToPost, headers);
+//   //     if (response?.data?.responseCode === 201) {
+//   //       setRefreshTrigger(!refreshTrigger);
+//   //       setOpen(false);
+//   //     }
+//   //   } catch (error) {
+//   //     console.error("Error creating candidate:", error.response?.data || error.message);
+//   //   }
+//   // };
+
+
+//   const postData = async (e) => {
+//   e.preventDefault();
+
+//   const validationErrors = validateForm();
+//   if (Object.keys(validationErrors).length > 0) {
+//     setErrors(validationErrors);
+//     return;
+//   }
+
+//   const now = new Date().toISOString();
+//   const dataToPost = {
+//     ...userdata,
+//     insertedDate: now,
+//     updatedDate: now,
+//     lastLogin: now,
+//     lastView: now,
+//     // ❌ remove mobileUserId: 0 → let backend assign it
+//     createdBy: { userId: user.userId }
+//   };
+
+//   try {
+//     const response = await addCandidate(dataToPost, headers);
+
+//     if (response?.data?.responseCode === 201) {
+//       Swal.fire({
+//         icon: "success",
+//         title: "Candidate Created",
+//         text: response.data.message || "Candidate added successfully",
+//         timer: 1500,
+//         showConfirmButton: false
+//       });
+
+//       // ✅ Fetch latest list to get backend-assigned mobileUserId
+//       await FetchData();
+
+//       setOpen(false);
+//     }
+//   } catch (error) {
+//     console.error("Error creating candidate:", error.response?.data || error.message);
+//     Swal.fire({
+//       icon: "error",
+//       title: "Error",
+//       text: error.response?.data?.errorMessage || error.message
+//     });
+//   }
+// };
+
+
+//  const updateData = async (e) => {
+//   e.preventDefault();
+//   const now = new Date().toISOString();
+//   const updatedDataPayload = {
+//     mobileUserId: mobileUserId, // ✅ must be set from handleEdit
+//     ...userdata,
+//     updatedDate: now,
+//     updatedBy: { userId: user.userId }
+//   };
+//   try {
+//     const response = await updateCandidates(updatedDataPayload, headers);
+//     if (response?.responseCode === 201) {
+//       setRefreshTrigger(!refreshTrigger);
+//       setOpen(false);
+//       setEditMode(false);
+//     }
+//   } catch (error) {
+//     console.error("Error updating candidate:", error.response?.data || error.message);
+//   }
+// };
+
+
+//   return (
+//     <MainCard
+//       title={
+//         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//           <span>Candidate</span>
+//           <Button
+//             variant="contained"
+//             sx={{ backgroundColor: "#03045E", '&:hover': { opacity: 0.9, backgroundColor: "#03045E" } }}
+//             onClick={handleAdd}
+//           >
+//             Add <AddIcon sx={{ color: '#fff' }} />
+//           </Button>
+//         </Box>
+//       }
+//     >
+//       <Grid container spacing={gridSpacing}></Grid>
+//       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+//         <TableContainer sx={{ maxHeight: 440 }}>
+//           <Table stickyHeader>
+//             <TableHead>
+//               <TableRow>
+//                 <TableCell>Id</TableCell>
+//                 {columns.map((column) => (
+//                   <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}>
+//                     {column.label}
+//                   </TableCell>
+//                 ))}
+//               </TableRow>
+//             </TableHead>
+//             <TableBody>
+//               {candidates.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+//                 <TableRow hover key={row.mobileUserId}>
+//                   <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+//                   {columns.map((column) => (
+//                     <TableCell key={column.id} align={column.align}>
+//                       {column.id === 'actions' ? (
+//                         <>
+//                           <IconButton onClick={() => handleEdit(row.mobileUserId)} sx={{ color: "#03045E" }}>
+//                             <Edit />
+//                           </IconButton>
+//                           <IconButton onClick={() => handleDelete(row.mobileUserId)} color="error">
+//                             <DeleteForever />
+//                           </IconButton>
+//                         </>
+//                       ) : (
+//                         row[column.id]
+//                       )}
+//                     </TableCell>
+//                   ))}
+//                 </TableRow>
+//               ))}
+//             </TableBody>
+//           </Table>
+//         </TableContainer>
+//         <TablePagination
+//           rowsPerPageOptions={[10, 25, 100]}
+//           component="div"
+//           count={candidates.length}
+//           rowsPerPage={rowsPerPage}
+//           page={page}
+//           onPageChange={handleChangePage}
+//           onRowsPerPageChange={handleChangeRowsPerPage}
+//         />
+//       </Paper>
+//       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
+//         <DialogTitle>{editMode ? 'Edit Candidate' : 'Add Candidate'}</DialogTitle>
+//         <Box component="form" onSubmit={editMode ? updateData : postData} sx={{ p: 3 }}>
+//           <Grid container spacing={2}>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Full Name" name="fullName" value={userdata.fullName} onChange={changeHandler} error={!!errors.fullName} helperText={errors.fullName} /></Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Username" name="userName" value={userdata.userName} onChange={changeHandler} error={!!errors.userName} helperText={errors.userName} /></Grid>
+//             <Grid item xs={12} sm={6}>
+//               <FormControl fullWidth error={!!errors.gender}>
+//                 <InputLabel>Gender</InputLabel>
+//                 <Select name="gender" value={userdata.gender} onChange={changeHandler}>
+//                   <MenuItem value="">Select</MenuItem>
+//                   <MenuItem value="Male">Male</MenuItem>
+//                   <MenuItem value="Female">Female</MenuItem>
+//                 </Select>
+//               </FormControl>
+//             </Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Email" name="mailId" value={userdata.mailId} onChange={changeHandler} error={!!errors.mailId} helperText={errors.mailId} /></Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Mobile Number" name="mobileNumber" value={userdata.mobileNumber} onChange={changeHandler} error={!!errors.mobileNumber} helperText={errors.mobileNumber} /></Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="OTP" name="otp" value={userdata.otp} onChange={changeHandler} /></Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Password" name="password" value={userdata.password} onChange={changeHandler} /></Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Profile Pic Name" name="profilePicName" value={userdata.profilePicName} onChange={changeHandler} /></Grid>
+//             <Grid item xs={12} sm={6}><TextField fullWidth label="Profile Pic Path" name="profilePicPath" value={userdata.profilePicPath} onChange={changeHandler} /></Grid>
+//           </Grid>
+//           <DialogActions>
+//             <Button onClick={() => setOpen(false)} sx={{ color: "#03045E" }}>Cancel</Button>
+//             <Button type="submit" variant="contained" sx={{ backgroundColor: "#03045E", '&:hover': { opacity: 0.9, backgroundColor: "#03045E" } }}>
+//               {editMode ? 'Update' : 'Save'}
+//             </Button>
+//           </DialogActions>
+//         </Box>
+//       </Dialog>
+//     </MainCard>
+//   );
+// };
+
+// export default Candidates;
+
+
 import * as React from 'react';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import Grid from '@mui/material/Grid';
+import {
+  Paper, Table, TableBody, TableCell, TableContainer,
+  TableHead, TablePagination, TableRow, Grid, Box,
+  Button, Dialog, DialogActions, DialogTitle, TextField,
+  IconButton, MenuItem, Select, InputLabel, FormControl
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
-import { Box, Button, Dialog, DialogActions, DialogTitle, TextField, IconButton, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { DeleteForever, Edit } from '@mui/icons-material';
-import { fetchCandidates,getCandidateById, addCandidate, deleteCandidate , updateCandidates} from '../../../API/CandidatesApi';
+import {
+  fetchCandidates, getCandidateById,
+  addCandidate, deleteCandidate, updateCandidates
+} from '../../../API/CandidatesApi';
 import Swal from 'sweetalert2';
 
 const columns = [
-  // { id: 'id', label: 'Id', minWidth: 120 },
-
   { id: 'fullName', label: 'Full Name', minWidth: 120 },
   { id: 'userName', label: 'Username', minWidth: 100 },
   { id: 'gender', label: 'Gender', minWidth: 80 },
@@ -1164,7 +1622,6 @@ const Candidates = () => {
   });
   const [errors, setErrors] = useState({});
   const [refreshTrigger, setRefreshTrigger] = useState(false);
-  // const [candidateId, setCandidateId] = useState(null);
   const [mobileUserId, setmobileUserId] = useState(null);
 
   const handleChangePage = (event, newPage) => setPage(newPage);
@@ -1245,240 +1702,136 @@ const Candidates = () => {
     setOpen(true);
   };
 
-  // const handleEdit = async (id) => {
-  //   setEditMode(true);
-  //   setOpen(true);
-  //   try {
-  //     const res = await getCandidateById(id, headers);
-  //     const det = res.data;
-  //     setCandidates(det.mobileUserId);
-  //     setUserData({
-  //       fullName: det.fullName || '',
-  //       userName: det.userName || '',
-  //       gender: det.gender || '',
-  //       mailId: det.mailId || '',
-  //       mobileNumber: det.mobileNumber || '',
-  //       otp: det.otp || '',
-  //       password: det.password || '',
-  //       profilePicName: det.profilePicName || '',
-  //       profilePicPath: det.profilePicPath || ''
-  //     });
-  //   } catch (error) {
-  //     console.error('Error fetching candidate details:', error);
-  //   }
-  // };
-
-  // const handleDelete = async (id) => {
-  //   try {
-  //     await deleteCandidate(id, headers);
-  //     FetchData();
-  //   } catch (error) {
-  //     console.error('Error deleting candidate:', error);
-  //   }
-  // };
- 
-
-
-// const handleDelete = async (id) => {
-//   try {
-//     const data = await deleteCandidate(id, headers);
-//     if (data.responseCode === 200) {
-//       // maybe show success notification here
-//       FetchData();
-//     } else {
-//       console.error('Delete failed:', data.message);
-//       // optionally show error notification here
-//     }
-//   } catch (error) {
-//     console.error('Error deleting candidate:', error);
-//     // optionally show error notification here
-//   }
-// };
-const handleEdit = async (id) => {
-  setEditMode(true);
-  setOpen(true);
-  try {
-    const res = await getCandidateById(id, headers);
-    const det = res.data;
-
-    // ✅ store the ID for update
-    setmobileUserId(det.mobileUserId);
-
-    setUserData({
-      fullName: det.fullName || '',
-      userName: det.userName || '',
-      gender: det.gender || '',
-      mailId: det.mailId || '',
-      mobileNumber: det.mobileNumber || '',
-      otp: det.otp || '',
-      password: det.password || '',
-      profilePicName: det.profilePicName || '',
-      profilePicPath: det.profilePicPath || ''
-    });
-  } catch (error) {
-    console.error('Error fetching candidate details:', error);
-  }
-};
-
-
-const handleDelete = async (mobileUserId) => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "This candidate will be permanently deleted.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!"
-  });
-
-  if (result.isConfirmed) {
+  const handleEdit = async (id) => {
+    setEditMode(true);
+    setOpen(true);
     try {
-      const data = await deleteCandidate(mobileUserId, headers);
+      const res = await getCandidateById(id, headers);
+      const det = res.data;
+      setmobileUserId(det.mobileUserId);
 
-      if (data?.responseCode === 200) {
-        // Remove candidate from state instantly for faster UI
-        setCandidates(prev => prev.filter(c => c.mobileUserId !== mobileUserId));
-
-        Swal.fire({
-          icon: "success",
-          title: "Deleted!",
-          text: data.message || "Candidate deleted successfully.",
-          timer: 1500,
-          showConfirmButton: false
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: data.message || "Failed to delete candidate"
-        });
-      }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.response?.data?.message || "An error occurred while deleting the candidate"
+      setUserData({
+        fullName: det.fullName || '',
+        userName: det.userName || '',
+        gender: det.gender || '',
+        mailId: det.mailId || '',
+        mobileNumber: det.mobileNumber || '',
+        otp: det.otp || '',
+        password: det.password || '',
+        profilePicName: det.profilePicName || '',
+        profilePicPath: det.profilePicPath || ''
       });
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
     }
-  }
-};
+  };
 
-  // const postData = async (e) => {
-  //   e.preventDefault();
-  //   const validationErrors = validateForm();
-  //   if (Object.keys(validationErrors).length > 0) {
-  //     setErrors(validationErrors);
-  //     return;
-  //   }
-  //   const now = new Date().toISOString();
-  //   const dataToPost = {
-  //     ...userdata,
-  //     insertedDate: now,
-  //     updatedDate: now,
-  //     lastLogin: now,
-  //     lastView: now,
-  //     mobileUserId: 0,
-  //     createdBy: { userId: user.userId }
-  //   };
-  //   try {
-  //     const response = await addCandidate(dataToPost, headers);
-  //     if (response?.data?.responseCode === 201) {
-  //       setRefreshTrigger(!refreshTrigger);
-  //       setOpen(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating candidate:", error.response?.data || error.message);
-  //   }
-  // };
+  const handleDelete = async (mobileUserId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This candidate will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
+    });
 
+    if (result.isConfirmed) {
+      try {
+        const data = await deleteCandidate(mobileUserId, headers);
+        if (data?.responseCode === 200) {
+          setCandidates(prev => prev.filter(c => c.mobileUserId !== mobileUserId));
+          Swal.fire("Deleted!", "Candidate deleted successfully.", "success");
+        } else {
+          Swal.fire("Error", data.message || "Failed to delete candidate", "error");
+        }
+      } catch (error) {
+        Swal.fire("Error", error.response?.data?.message || "Delete failed", "error");
+      }
+    }
+  };
 
   const postData = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
-  const validationErrors = validateForm();
-  if (Object.keys(validationErrors).length > 0) {
-    setErrors(validationErrors);
-    return;
-  }
+    const now = new Date().toISOString();
+    const dataToPost = {
+      ...userdata,
+      mobileUserId: 0, // backend will assign
+      insertedDate: now,
+      updatedDate: now,
+      lastLogin: now,
+      lastView: now,
+      createdBy: {
+        fullName: user.fullName,
+        mobileNumber: user.mobileNumber,
+        userId: user.userId,
+        userName: user.userName
+      },
+      updatedBy: {
+        fullName: user.fullName,
+        mobileNumber: user.mobileNumber,
+        userId: user.userId,
+        userName: user.userName
+      }
+    };
 
-  const now = new Date().toISOString();
-  const dataToPost = {
-    ...userdata,
-    insertedDate: now,
-    updatedDate: now,
-    lastLogin: now,
-    lastView: now,
-    // ❌ remove mobileUserId: 0 → let backend assign it
-    createdBy: { userId: user.userId }
+    try {
+      const response = await addCandidate(dataToPost, headers);
+      if (response?.data?.responseCode === 201) {
+        Swal.fire("Success", "Candidate created successfully", "success");
+        await FetchData();
+        setOpen(false);
+      }
+    } catch (error) {
+      Swal.fire("Error", error.response?.data?.errorMessage || "Create failed", "error");
+    }
   };
 
-  try {
-    const response = await addCandidate(dataToPost, headers);
+  const updateData = async (e) => {
+    e.preventDefault();
+    const now = new Date().toISOString();
+    const updatedDataPayload = {
+      mobileUserId,
+      ...userdata,
+      updatedDate: now,
+      updatedBy: {
+        fullName: user.fullName,
+        mobileNumber: user.mobileNumber,
+        userId: user.userId,
+        userName: user.userName
+      }
+    };
 
-    if (response?.data?.responseCode === 201) {
-      Swal.fire({
-        icon: "success",
-        title: "Candidate Created",
-        text: response.data.message || "Candidate added successfully",
-        timer: 1500,
-        showConfirmButton: false
-      });
-
-      // ✅ Fetch latest list to get backend-assigned mobileUserId
-      await FetchData();
-
-      setOpen(false);
+    try {
+      const response = await updateCandidates(updatedDataPayload, headers);
+      if (response?.responseCode === 201) {
+        setRefreshTrigger(!refreshTrigger);
+        setOpen(false);
+        setEditMode(false);
+      }
+    } catch (error) {
+      Swal.fire("Error", error.response?.data?.errorMessage || "Update failed", "error");
     }
-  } catch (error) {
-    console.error("Error creating candidate:", error.response?.data || error.message);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error.response?.data?.errorMessage || error.message
-    });
-  }
-};
-
-
- const updateData = async (e) => {
-  e.preventDefault();
-  const now = new Date().toISOString();
-  const updatedDataPayload = {
-    mobileUserId: mobileUserId, // ✅ must be set from handleEdit
-    ...userdata,
-    updatedDate: now,
-    updatedBy: { userId: user.userId }
   };
-  try {
-    const response = await updateCandidates(updatedDataPayload, headers);
-    if (response?.responseCode === 201) {
-      setRefreshTrigger(!refreshTrigger);
-      setOpen(false);
-      setEditMode(false);
-    }
-  } catch (error) {
-    console.error("Error updating candidate:", error.response?.data || error.message);
-  }
-};
-
 
   return (
     <MainCard
       title={
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>Candidate</span>
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: "#03045E", '&:hover': { opacity: 0.9, backgroundColor: "#03045E" } }}
-            onClick={handleAdd}
-          >
+          <Button variant="contained" onClick={handleAdd} sx={{ backgroundColor: "#03045E" }}>
             Add <AddIcon sx={{ color: '#fff' }} />
           </Button>
         </Box>
       }
     >
-      <Grid container spacing={gridSpacing}></Grid>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader>
@@ -1486,7 +1839,7 @@ const handleDelete = async (mobileUserId) => {
               <TableRow>
                 <TableCell>Id</TableCell>
                 {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}>
+                  <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600 }}>
                     {column.label}
                   </TableCell>
                 ))}
@@ -1507,9 +1860,7 @@ const handleDelete = async (mobileUserId) => {
                             <DeleteForever />
                           </IconButton>
                         </>
-                      ) : (
-                        row[column.id]
-                      )}
+                      ) : row[column.id]}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -1527,6 +1878,7 @@ const handleDelete = async (mobileUserId) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
         <DialogTitle>{editMode ? 'Edit Candidate' : 'Add Candidate'}</DialogTitle>
         <Box component="form" onSubmit={editMode ? updateData : postData} sx={{ p: 3 }}>
@@ -1540,6 +1892,7 @@ const handleDelete = async (mobileUserId) => {
                   <MenuItem value="">Select</MenuItem>
                   <MenuItem value="Male">Male</MenuItem>
                   <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -1552,7 +1905,7 @@ const handleDelete = async (mobileUserId) => {
           </Grid>
           <DialogActions>
             <Button onClick={() => setOpen(false)} sx={{ color: "#03045E" }}>Cancel</Button>
-            <Button type="submit" variant="contained" sx={{ backgroundColor: "#03045E", '&:hover': { opacity: 0.9, backgroundColor: "#03045E" } }}>
+            <Button type="submit" variant="contained" sx={{ backgroundColor: "#03045E" }}>
               {editMode ? 'Update' : 'Save'}
             </Button>
           </DialogActions>

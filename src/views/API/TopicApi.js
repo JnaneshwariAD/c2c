@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 export const fetchTopics = async (headers) => {
     return await axios({
         method: 'GET',
-        url: `${BaseUrl}/topic/v1/getAllTopicByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+        url: `${BaseUrl}/topic/v1/getAllTopicByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
         headers: headers
     });
 };

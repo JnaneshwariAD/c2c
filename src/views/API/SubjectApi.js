@@ -6,7 +6,7 @@ import { BaseUrl } from 'BaseUrl';
 export const fetchSubjects = async (headers) => {
   return await axios({
     method: 'GET',
-    url: `${BaseUrl}/subject/v1/getAllSubjectsByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+    url: `${BaseUrl}/subject/v1/getAllSubjectsByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
     headers
   });
 };

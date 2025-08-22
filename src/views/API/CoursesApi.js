@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 export const fetchCourses = async (headers) => {
     return await axios({
       method: 'GET',
-      url: `${BaseUrl}/course/v1/getAllCourseByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=10`,
+      url: `${BaseUrl}/course/v1/getAllCourseByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
       headers: headers
     }); 
   };

@@ -33,6 +33,11 @@ import { BaseUrl } from 'BaseUrl';
 import { useRef } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import CollegeCards from './CollegeCards';
 
 const columns = [
   { id: 'collegeId', label: 'ID', align: 'center' },
@@ -75,6 +80,7 @@ const College = () => {
   const [collegePicName, setCollegePicName] = useState('');
   const [fileError, setFileError] = useState('');
   const [selectedFile, setselectedFile] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
   const inputRef = useRef(null);
 
   const handleChangePage = (event, newPage) => {
@@ -401,71 +407,87 @@ const College = () => {
       title={
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>College</span>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              display: 'flex', alignItems: 'center', fontSize: '15px', backgroundColor: "#03045E",
-              '&:hover': {
-                backgroundColor: "#03045E",
-                opacity: 0.9
-              }
-            }}
-            onClick={handleAddCollege}
-          >
-            Add
-            <AddIcon sx={{ color: '#fff' }} />
-          </Button>
+          <Box display="flex" alignItems="center" gap={1}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(e, val) => val && setViewMode(val)}
+              size="small"
+            >
+              <ToggleButton value="list">
+                <ViewListIcon />
+              </ToggleButton>
+              <ToggleButton value="card">
+                <ViewModuleIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                display: 'flex', alignItems: 'center', fontSize: '15px', backgroundColor: "#03045E",
+                '&:hover': {
+                  backgroundColor: "#03045E",
+                  opacity: 0.9
+                }
+              }}
+              onClick={handleAddCollege}
+            >
+              Add
+              <AddIcon sx={{ color: '#fff' }} />
+            </Button>
+          </Box>
         </Box>
       }
     >
       <Grid container spacing={gridSpacing}></Grid>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}>
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            {/* <TableBody>
-              {courses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.collegeId}>
+      {viewMode === 'list' ? (
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
                   {columns.map((column) => (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.id === 'actions' ? (
-                        <>
-                          <IconButton
-                            sx={{ color: "#03045E" }}
-                            onClick={() => {
-                              handleEdit(row.collegeId);
-                            }}
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={() => {
-                              handleDelete(row.collegeId);
-                            }}
-                          >
-                            <DeleteForever />
-                          </IconButton>
-                        </>
-                      ) : (
-                        row[column.id]
-                      )}
+                    <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}>
+                      {column.label}
                     </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableBody> */}
+              </TableHead>
+              {/* <TableBody>
+                {courses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.collegeId}>
+                    {columns.map((column) => (
+                      <TableCell key={column.id} align={column.align}>
+                        {column.id === 'actions' ? (
+                          <>
+                            <IconButton
+                              sx={{ color: "#03045E" }}
+                              onClick={() => {
+                                handleEdit(row.collegeId);
+                              }}
+                            >
+                              <Edit />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              onClick={() => {
+                                handleDelete(row.collegeId);
+                              }}
+                            >
+                              <DeleteForever />
+                            </IconButton>
+                          </>
+                        ) : (
+                          row[column.id]
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody> */}
 
-            <TableBody>
+              <TableBody>
   {courses.length === 0 ? (
     <TableRow>
       <TableCell colSpan={columns.length} align="center">
@@ -513,18 +535,29 @@ const College = () => {
       })
   )}
 </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={courses.length}
-          rowsPerPage={rowsPerPage}
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={courses.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      ) : (
+        <CollegeCards
+          colleges={courses}
           page={page}
+          rowsPerPage={rowsPerPage}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
+      )}
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md" id="your-dialog-id">
         <DialogTitle sx={{ fontSize: '16px' }}>{editMode ? 'Edit College' : 'Add College'}</DialogTitle>
         <Box component="form" onSubmit={editMode ? updateData : postData} noValidate sx={{ p: 3 }}>

@@ -21,11 +21,11 @@ import { DeleteForever, Edit } from '@mui/icons-material';
 import { addUniversity, deleteUniversity, fetchUniversities, getUniveristy_ById, updatedUniversity } from 'views/API/UniversityApi';
 import Swal from 'sweetalert2';
 import { minHeight, minWidth } from '@mui/system';
-
-
-
-
-
+import UniversityCards from './UniversityCards';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 
 const columns = [
   { id: 'universityId', label: 'ID', align: 'center' },
@@ -59,6 +59,7 @@ const University = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [universityId, setuniversityId] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
   const inputRef = useRef(null);
 
   const handleChangePage = (event, newPage) => {
@@ -128,7 +129,7 @@ const University = () => {
       createdBy: { userId: user.userId }
     };
 
-    console.log(dataToPost);
+    // console.log("dataToPost "+dataToPost);
 
     try {
       const response = await addUniversity(dataToPost, headers);
@@ -159,7 +160,7 @@ const University = () => {
       universityPicName,
       updatedBy: { userId: user.userId }
     };
-    console.log(updatedDataPayload);
+    console.log("updatedDataPayload :"+ updatedDataPayload);
     try {
       const response = await updatedUniversity(updatedDataPayload, headers);
       if (response.data.responseCode === 201) {
@@ -312,61 +313,77 @@ const handleDelete = async (universityId) => {
       title={
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>University</span>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              display: 'flex', alignItems: 'center', fontSize: '15px', backgroundColor: "#03045E",
-              '&:hover': {
-                backgroundColor: "#03045E",
-                opacity: 0.9
-              }
-            }}
-            onClick={handleAddBanner}
-          >
-            Add
-            <AddIcon sx={{ color: '#fff' }} />
-          </Button>
+          <Box display="flex" alignItems="center" gap={1}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(e, val) => val && setViewMode(val)}
+              size="small"
+            >
+              <ToggleButton value="list">
+                <ViewListIcon />
+              </ToggleButton>
+              <ToggleButton value="card">
+                <ViewModuleIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                display: 'flex', alignItems: 'center', fontSize: '15px', backgroundColor: "#03045E",
+                '&:hover': {
+                  backgroundColor: "#03045E",
+                  opacity: 0.9
+                }
+              }}
+              onClick={handleAddBanner}
+            >
+              Add
+              <AddIcon sx={{ color: '#fff' }} />
+            </Button>
+          </Box>
         </Box>
       }
     >
       <Grid container spacing={gridSpacing}></Grid>
       {/* Universities  */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}>
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {advertisement.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.universityId}>
-                  {columns.map((column) => (
-                    <TableCell key={column.id} align={column.align}>
-                      {column.id === 'actions' ? (
-                        <>
-                          <IconButton onClick={() => handleEdit(row.universityId)} sx={{color: "#03045E"}}>
-                            <Edit />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(row.universityId)} color="error">
-                            <DeleteForever />
-                          </IconButton>
-                        </>
-                      ) : (
-                        row[column.id]
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+      {viewMode === 'list' ? (
+  <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+    <TableContainer sx={{ maxHeight: 440 }}>
+      <Table stickyHeader aria-label="sticky table">
+        <TableHead>
+          <TableRow>
+            {columns.map((column) => (
+              <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}>
+                {column.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {advertisement.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+            <TableRow hover role="checkbox" tabIndex={-1} key={row.universityId}>
+              {columns.map((column) => (
+                <TableCell key={column.id} align={column.align}>
+                  {column.id === 'actions' ? (
+                    <>
+                      <IconButton onClick={() => handleEdit(row.universityId)} sx={{color: "#03045E"}}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton onClick={() => handleDelete(row.universityId)} color="error">
+                        <DeleteForever />
+                      </IconButton>
+                    </>
+                  ) : (
+                    row[column.id]
+                  )}
+                </TableCell>
               ))}
-            </TableBody>
-            {/* <TableBody>
+            </TableRow>
+          ))}
+        </TableBody>
+        {/* <TableBody>
   {advertisement.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
     <TableRow hover role="checkbox" tabIndex={-1} key={row.universityId}>
       <TableCell>{page * rowsPerPage + index + 1}</TableCell>
@@ -389,20 +406,29 @@ const handleDelete = async (universityId) => {
     </TableRow>
   ))}
 </TableBody> */}
-          </Table>
-        </TableContainer>
+      </Table>
+    </TableContainer>
 
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={advertisement.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-      
+    <TablePagination
+      rowsPerPageOptions={[10, 25, 100]}
+      component="div"
+      count={advertisement.length}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={handleChangePage}
+      onRowsPerPageChange={handleChangeRowsPerPage}
+    />
+  </Paper>
+) : (
+  <UniversityCards
+    universities={advertisement}
+    page={page}
+    rowsPerPage={rowsPerPage}
+    onEdit={handleEdit}
+    onDelete={handleDelete}
+  />
+)}
+
 
       {/* Add University details  */}
       <Dialog open={open} onClose={()  => setOpen(false)} fullWidth maxWidth="md" id="your-dialog-id">

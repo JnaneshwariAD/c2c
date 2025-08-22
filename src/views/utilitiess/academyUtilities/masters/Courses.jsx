@@ -33,6 +33,11 @@ import { addCourse, deleteCourse, fetchCourseById, fetchCourses, updatedCourse }
 import { fetchAllUniversities, fetchAllCategories, fetchAllBranches } from 'views/API/CoursesApi';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import CoursesCards from './CoursesCards';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 
 const columns = [
   { id: 'courseId', label: 'ID' },
@@ -66,6 +71,7 @@ const UpSkillCourses = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [universities, setUniversities] = useState([]);
   const [courseId, setCourseId] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
 
   const user = JSON.parse(sessionStorage.getItem('user'));
   const headers = {
@@ -373,23 +379,40 @@ const UpSkillCourses = () => {
         title={
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>Courses</span>
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{
-                display: 'flex', alignItems: 'center', fontSize: '15px', backgroundColor: "#03045E",
-                '&:hover': { backgroundColor: "#03045E", opacity: 0.9 }
-              }}
-              onClick={handleAddCourses}
-            >
-              Add
-              <AddIcon sx={{ color: '#fff' }} />
-            </Button>
+            <Box display="flex" alignItems="center" gap={1}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(e, val) => val && setViewMode(val)}
+                size="small"
+              >
+                <ToggleButton value="list">
+                  <ViewListIcon />
+                </ToggleButton>
+                <ToggleButton value="card">
+                  <ViewModuleIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  display: 'flex', alignItems: 'center', fontSize: '15px', backgroundColor: "#03045E",
+                  '&:hover': { backgroundColor: "#03045E", opacity: 0.9 }
+                }}
+                onClick={handleAddCourses}
+              >
+                Add
+                <AddIcon sx={{ color: '#fff' }} />
+              </Button>
+            </Box>
           </Box>
         }
       >
         <Grid container spacing={gridSpacing}></Grid>
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        {viewMode === 'list' ? (
+  <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
@@ -443,7 +466,17 @@ const UpSkillCourses = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
-
+) : (
+  <CoursesCards
+    courses={courses}
+    page={page}
+    rowsPerPage={rowsPerPage}
+    onEdit={handleEdit}
+    onDelete={handleDelete}
+    onPageChange={handleChangePage}
+    onRowsPerPageChange={handleChangeRowsPerPage}
+  />
+)}
         <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
           <DialogTitle sx={{ fontSize: '16px' }}>
             {editMode ? 'Edit Course' : 'Add Course'}
