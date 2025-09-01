@@ -22,23 +22,23 @@ const CoursesCards = ({ courses, page, rowsPerPage, onEdit, onDelete, onPageChan
                   },
                 }}
               >
-                <CardContent>
-                  <Typography variant="h4" align="center" sx={{ fontWeight: 'bold', mb: 1 }}>
+                <CardContent style={{textAlign: 'center'}}>
+                  <Typography variant="h4"  sx={{ fontWeight: 'bold', mb: 1 }}>
                     {course.courseName}
                   </Typography>
-                  <Typography variant="body2" align="center" color="text.secondary">
+                  <Typography variant="body2"  color="text.secondary">
                     {course.description}
                   </Typography>
-                  <Typography variant="h4" align="center" sx={{ mt: 1 }}>
+                  <Typography variant="h4"  sx={{ mt: 1 }}>
                     University: {course.universityName}
                   </Typography>
-                  <Typography variant="h5" align="center" sx={{ mt: 1 }}>
+                  <Typography variant="h5"  sx={{ mt: 1 }}>
                     Category: {course.categoryName}
                   </Typography>
-                  {/* <Typography variant="body2" align="center" sx={{ mt: 1 }}>
+                  {/* <Typography variant="body2"  sx={{ mt: 1 }}>
                     No. of Semesters: {course.noOfSem}
                   </Typography> */}
-                  {/* <Typography variant="body2" align="center" sx={{ mt: 1 }}>
+                  {/* <Typography variant="body2"  sx={{ mt: 1 }}>
                     Video URL: {course.videoUrl}
                   </Typography> */}
                   <Grid container spacing={1} justifyContent="center" sx={{ mt: 2 }}>

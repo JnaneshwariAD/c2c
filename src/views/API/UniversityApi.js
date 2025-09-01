@@ -2,8 +2,6 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { BaseUrl } from 'BaseUrl';
 
-
-
 export const fetchUniversities = async (headers) => {
   return await axios({
     method: 'get',
@@ -12,8 +10,6 @@ export const fetchUniversities = async (headers) => {
   });
 };
 
-
-
 export const getUniveristy_ById = async (id, headers) => {
   return await axios({
     method: 'GET',
@@ -21,8 +17,6 @@ export const getUniveristy_ById = async (id, headers) => {
     headers: headers
   });
 };
-
-
 
 export const addUniversity = async (data, headers) => {
   try {
@@ -57,8 +51,6 @@ export const addUniversity = async (data, headers) => {
   }
 };
 
-
-
 export const updatedUniversity = async (updatedData, headers) => {
   try {
     const res = await axios({
@@ -92,6 +84,58 @@ export const updatedUniversity = async (updatedData, headers) => {
   }
 };
 
+// export const deleteUniversity = async (id, headers) => {
+//   try {
+//     const confirm = await Swal.fire({
+//       title: 'Delete University',
+//       text: "This action cannot be undone!",
+//       icon: 'warning',
+//       showCancelButton: true,
+//       confirmButtonColor: '#d33',
+//       cancelButtonColor: '#3085d6',
+//       confirmButtonText: 'Delete',
+//       cancelButtonText: 'Cancel'
+//     });
+
+//     if (confirm.isConfirmed) {
+//       const res = await axios({
+//         method: 'DELETE',
+//         url: `${BaseUrl}/university/v1/deleteUniversityById/${id}`,
+//         headers
+//       });
+
+//       if (res.data.responseCode === 200) {
+//         Swal.fire('Deleted!', 'University removed successfully.', 'success');
+//         return true;
+//       }
+//       throw new Error(res.data.errorMessage || 'Deletion failed');
+//     }
+//     return false;
+//   } catch (error) {
+//     let message = 'Deletion failed';
+    
+//     if (error.response?.data?.errorMessage?.includes('foreign key constraint')) {
+//       message = `
+//         This university cannot be deleted because:
+//         <ul style="text-align: left; margin: 10px 0 0 20px;">
+//           <li>It's associated with branch records</li>
+//           <li>It may be linked to user accounts</li>
+//         </ul>
+//         <p style="margin-top: 15px;">Please remove these associations first.</p>
+//       `;
+//     }
+
+//     Swal.fire({
+//       icon: 'error',
+//       title: 'Cannot Delete',
+//       html: message,
+//       confirmButtonColor: '#03045E'
+//     });
+//     return false;
+//   }
+// };
+
+
 export const deleteUniversity = async (id, headers) => {
   try {
     const confirm = await Swal.fire({
@@ -116,27 +160,15 @@ export const deleteUniversity = async (id, headers) => {
         Swal.fire('Deleted!', 'University removed successfully.', 'success');
         return true;
       }
+
       throw new Error(res.data.errorMessage || 'Deletion failed');
     }
     return false;
   } catch (error) {
-    let message = 'Deletion failed';
-    
-    if (error.response?.data?.errorMessage?.includes('foreign key constraint')) {
-      message = `
-        This university cannot be deleted because:
-        <ul style="text-align: left; margin: 10px 0 0 20px;">
-          <li>• It's associated with branch records</li>
-          <li>• It may be linked to user accounts</li>
-        </ul>
-        <p style="margin-top: 15px;">Please remove these associations first.</p>
-      `;
-    }
-
     Swal.fire({
       icon: 'error',
       title: 'Cannot Delete',
-      html: message,
+      text: error.response?.data?.errorMessage || 'Deletion failed',
       confirmButtonColor: '#03045E'
     });
     return false;

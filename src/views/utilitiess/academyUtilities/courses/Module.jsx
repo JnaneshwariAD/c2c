@@ -1,580 +1,570 @@
-// import * as React from 'react';
-// import {
-//   Box,
-//   Button,
-//   Dialog,
-//   DialogActions,
-//   DialogTitle,
-//   TextField,
-//   Grid,
-//   Paper,
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableContainer,
-//   TableHead,
-//   TablePagination,
-//   TableRow,
-//   MenuItem,
-//   Select,
-//   InputLabel,
-//   FormControl,
-//   IconButton
-// } from '@mui/material';
-// import AddIcon from '@mui/icons-material/Add';
-// import { DeleteForever, Edit } from '@mui/icons-material';
-// import MainCard from 'ui-component/cards/MainCard';
-// import { gridSpacing } from 'store/constant';
-// import { useState, useEffect, useRef } from 'react';
-// import moment from 'moment';
-// import { useTheme } from '@mui/material/styles';
-// import { addModule, deleteModule, fetchModuleById, fetchModules, updatedModule } from 'views/API/ModuleApi';
-// import { fetchAllSubjects } from 'views/API/SubjectApi';
-// import { BaseUrl } from 'BaseUrl';
-// import axios from 'axios';
-// import Swal from 'sweetalert2';
-
-// const columns = [
-//   { id: 'moduleId', label: 'ID' },
-//   { id: 'moduleName', label: 'Name', minWidth: 100 },
-//   { id: 'description', label: 'Description', minWidth: 400 },
-//   { id: 'subjectName', label: 'Subject Name', minWidth: 150 },
-//   { id: 'file', label: 'PDF File', minWidth: 200 },
-//   { id: 'createdBy', label: 'Created By', align: 'right' },
-//   { id: 'updatedBy', label: 'Updated By', align: 'right' },
-//   { id: 'insertedDate', label: 'Inserted Date', align: 'right' },
-//   { id: 'updatedDate', label: 'Updated Date', align: 'right' },
-//   { id: 'actions', label: 'Actions', align: 'right' }
-// ];
-
-// const Modules = () => {
-//   const theme = useTheme();
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(10);
-//   const [subjects, setSubjects] = useState([]);
-//   const [modules, setModules] = useState([]);
-//   const [open, setOpen] = useState(false);
-//   const [editMode, setEditMode] = useState(false);
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [userdata, setUserData] = useState({
-//     moduleName: '',
-//     description: '',
-//     subjectId: '',
-//     fileName: '',
-//     filePath: null
-//   });
-//   const [errors, setErrors] = useState({});
-//   const [refreshTrigger, setRefreshTrigger] = useState(false);
-//   const [moduleId, setModuleId] = useState(null);
-//   const inputRef = useRef(null);
-
-//   const user = JSON.parse(sessionStorage.getItem('user'));
-//   const headers = {
-//     'Content-type': 'application/json',
-//     Authorization: 'Bearer ' + user.accessToken
-//   };
-
-//   const handleChangePage = (event, newPage) => setPage(newPage);
-//   const handleChangeRowsPerPage = (event) => {
-//     setRowsPerPage(+event.target.value);
-//     setPage(0);
-//   };
-
-//   const fetchData = async () => {
-//     try {
-//       const res = await fetchModules(headers);
-//       const fetchedData = res.data.content || [];
-//       const tableData = fetchedData
-//         .map((p) => ({
-//           moduleId: p.moduleId,
-//           moduleName: p.moduleName,
-//           description: (
-//             <div style={{ textAlign: 'justify', textJustify: 'inter-word', whiteSpace: 'pre-line' }}>
-//               {p.description}
-//             </div>
-//           ),
-//           subjectName: p.subjectDtoList?.[0]?.subjectName || 'No subject',
-//           file: p.filePath
-//             ? (
-//               <a
-//                 href={`${BaseUrl}/file/downloadFile/?filePath=${p.filePath}`}
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//               >
-//                 {p.fileName || 'Download PDF'}
-//               </a>
-//             )
-//             : 'NO FILE FOUND',
-//           insertedDate: moment(p.insertedDate).format('L'),
-//           updatedDate: moment(p.updatedDate).format('L'),
-//           createdBy: p.createdBy ? p.createdBy.userName : 'No User',
-//           updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-//         }))
-//         .sort((a, b) => a.moduleId - b.moduleId);
-//       setModules(tableData);
-//     } catch (error) {
-//       console.error('Error fetching modules:', error);
-//     }
-//   };
-
-//   const fetchSubjects = async () => {
-//     try {
-//       const res = await fetchAllSubjects(headers);
-//       const fetchedData = res.data;
-//       if (fetchedData) {
-//         const sortedData = fetchedData.sort((a, b) => a.subjectName.localeCompare(b.subjectName));
-//         setSubjects(sortedData.map((s) => ({ subjectId: s.subjectId, subjectName: s.subjectName })));
-//       }
-//     } catch (error) {
-//       console.error('Error fetching subjects:', error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchData();
-//     fetchSubjects();
-//   }, [refreshTrigger]);
-
-//   const validateForm = () => {
-//     const newErrors = {};
-//     if (!userdata.moduleName.trim()) newErrors.moduleName = 'Enter the module name';
-//     if (!userdata.description.trim()) newErrors.description = 'Enter the description';
-//     if (!userdata.subjectId) newErrors.subjectId = 'Select a subject';
-//     return newErrors;
-//   };
-
-//   const changeHandler = (e) => {
-//     setUserData({ ...userdata, [e.target.name]: e.target.value });
-//     setErrors({ ...errors, [e.target.name]: null });
-//   };
-
-//   const handleAddModule = () => {
-//     setEditMode(false);
-//     setUserData({ moduleName: '', description: '', subjectId: '', fileName: '', filePath: null });
-//     setSelectedFile(null);
-//     setOpen(true);
-//   };
-
-//   const onFileChange = (e) => {
-//     if (e.target.files && e.target.files[0]) {
-//       setSelectedFile(e.target.files[0]);
-//     }
-//   };
-
-//   const onFileUpload = async () => {
-//     if (!selectedFile) {
-//       Swal.fire({
-//         icon: 'error',
-//         title: 'No file selected',
-//         text: 'Please select a file',
-//         confirmButtonColor: theme.palette.primary.main
-//       });
-//       return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append('file', selectedFile);
-
-//     try {
-//       Swal.fire({
-//         title: 'Uploading...',
-//         allowOutsideClick: false,
-//         didOpen: () => Swal.showLoading()
-//       });
-
-//       const res = await axios.post(`${BaseUrl}/file/uploadFile`, formData, {
-//         headers: {
-//           'Content-Type': 'multipart/form-data',
-//           Authorization: 'Bearer ' + user.accessToken
-//         }
-//       });
-
-//       Swal.close();
-
-//       if (res.status === 200) {
-//         setUserData((prev) => ({
-//           ...prev,
-//           fileName: res.data.fileName,
-//           filePath: res.data.filePath || res.data.fileDownloadUri || null
-//         }));
-//         Swal.fire({
-//           icon: 'success',
-//           title: 'File uploaded successfully',
-//           showConfirmButton: false,
-//           timer: 1500
-//         });
-//       }
-//     } catch (err) {
-//       Swal.close();
-//       Swal.fire({
-//         icon: 'error',
-//         title: 'Upload failed',
-//         text: 'Please try again',
-//         confirmButtonColor: theme.palette.primary.main
-//       });
-//       console.error(err);
-//     }
-//   };
-
-//   const postData = async (e) => {
-//     e.preventDefault();
-//     const validationErrors = validateForm();
-//     if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
-
-//     const dataToPost = {
-//       moduleName: userdata.moduleName,
-//       description: userdata.description,
-//       subjectDtoList: [{ subjectId: userdata.subjectId }],
-//       fileName: userdata.fileName,
-//       filePath: userdata.filePath,
-//       createdBy: { userId: user.userId }
-//     };
-
-//     try {
-//       await addModule(dataToPost, headers);
-//       setRefreshTrigger(!refreshTrigger);
-//       setOpen(false);
-//     } catch (error) {
-//       console.error('Error in postData:', error);
-//     }
-//   };
-
-//   const updateData = async (e) => {
-//     e.preventDefault();
-//     const validationErrors = validateForm();
-//     if (Object.keys(validationErrors).length > 0) return setErrors(validationErrors);
-
-//     const updatedDataPayload = {
-//       moduleId,
-//       moduleName: userdata.moduleName,
-//       description: userdata.description,
-//       subjectDtoList: [{ subjectId: userdata.subjectId }],
-//       fileName: userdata.fileName,
-//       filePath: userdata.filePath,
-//       updatedBy: { userId: user.userId }
-//     };
-
-//     try {
-//       const response = await updatedModule(updatedDataPayload, headers);
-//       if ([200, 201].includes(response.data.responseCode)) {
-//         setRefreshTrigger(!refreshTrigger);
-//         setOpen(false);
-//         setEditMode(false);
-//         setModuleId(null);
-//         Swal.fire({
-//           icon: 'success',
-//           title: 'Success',
-//           text: 'Module updated successfully',
-//           showConfirmButton: false,
-//           timer: 1500
-//         });
-//       }
-//     } catch (error) {
-//       console.error('Error updating module:', error);
-//     }
-//   };
-
-//   const handleEdit = async (id) => {
-//     setEditMode(true);
-//     setOpen(true);
-//     setModuleId(id);
-//     try {
-//       const res = await fetchModuleById(id, headers);
-//       const det = res.data;
-//       setUserData({
-//         moduleName: det.moduleName,
-//         description: det.description,
-//         subjectId: det.subjectDtoList?.[0]?.subjectId || '',
-//         fileName: det.fileName || '',
-//         filePath: det.filePath || det.fileDownloadUri || null
-//       });
-//     } catch (error) {
-//       console.error('Error fetching module details:', error);
-//     }
-//   };
-
-//   const handleDelete = async (id) => {
-//     try {
-//       const result = await Swal.fire({
-//         title: 'Are you sure?',
-//         text: "You won't be able to revert this!",
-//         icon: 'warning',
-//         showCancelButton: true,
-//         confirmButtonColor: '#03045E',
-//         cancelButtonColor: '#d33',
-//         confirmButtonText: 'Yes, delete it!'
-//       });
-
-//       if (result.isConfirmed) {
-//         await deleteModule(id, headers);
-//         setRefreshTrigger(!refreshTrigger);
-//         Swal.fire({
-//           icon: 'success',
-//           title: 'Deleted!',
-//           text: 'Module has been deleted.',
-//           showConfirmButton: false,
-//           timer: 1500
-//         });
-//       }
-//     } catch (error) {
-//       console.error('Error deleting module:', error);
-//     }
-//   };
-
-//   return (
-//     <MainCard
-//       title={
-//         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-//           <span>Modules</span>
-//           <Button
-//             variant="contained"
-//             sx={{
-//               display: 'flex',
-//               alignItems: 'center',
-//               fontSize: '15px',
-//               backgroundColor: '#03045E',
-//               '&:hover': { opacity: 0.9 }
-//             }}
-//             onClick={handleAddModule}
-//           >
-//             Add <AddIcon sx={{ color: '#fff' }} />
-//           </Button>
-//         </Box>
-//       }
-//     >
-//       <Grid container spacing={gridSpacing}></Grid>
-//       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-//         <TableContainer sx={{ maxHeight: 440 }}>
-//           <Table stickyHeader>
-//             <TableHead>
-//               <TableRow>
-//                 {columns.map((column) => (
-//                   <TableCell
-//                     key={column.id}
-//                     align={column.align}
-//                     style={{ minWidth: column.minWidth, fontWeight: 600, fontSize: 15 }}
-//                   >
-//                     {column.label}
-//                   </TableCell>
-//                 ))}
-//               </TableRow>
-//             </TableHead>
-//             <TableBody>
-//               {modules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-//                 <TableRow hover role="checkbox" tabIndex={-1} key={row.moduleId}>
-//                   {columns.map((column) => (
-//                     <TableCell key={column.id} align={column.align}>
-//                       {column.id === 'actions' ? (
-//                         <>
-//                           <IconButton sx={{ color: '#03045E' }} onClick={() => handleEdit(row.moduleId)}>
-//                             <Edit />
-//                           </IconButton>
-//                           <IconButton color="error" onClick={() => handleDelete(row.moduleId)}>
-//                             <DeleteForever />
-//                           </IconButton>
-//                         </>
-//                       ) : (
-//                         row[column.id] || 'No Data'
-//                       )}
-//                     </TableCell>
-//                   ))}
-//                 </TableRow>
-//               ))}
-//             </TableBody>
-//           </Table>
-//         </TableContainer>
-//         <TablePagination
-//           rowsPerPageOptions={[10, 25, 100]}
-//           component="div"
-//           count={modules.length}
-//           rowsPerPage={rowsPerPage}
-//           page={page}
-//           onPageChange={handleChangePage}
-//           onRowsPerPageChange={handleChangeRowsPerPage}
-//         />
-//       </Paper>
-
-//       {/* Dialog for Add/Edit */}
-//       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
-//         <DialogTitle>{editMode ? 'Edit Module' : 'Add Module'}</DialogTitle>
-//         <Box component="form" onSubmit={editMode ? updateData : postData} sx={{ p: 3 }}>
-//           <Grid container spacing={2}>
-//             <Grid item xs={12}>
-//               <TextField
-//                 fullWidth
-//                 label="Module Name"
-//                 name="moduleName"
-//                 value={userdata.moduleName}
-//                 onChange={changeHandler}
-//                 error={!!errors.moduleName}
-//                 helperText={errors.moduleName}
-//               />
-//             </Grid>
-//             <Grid item xs={12}>
-//               <TextField
-//                 fullWidth
-//                 label="Description"
-//                 name="description"
-//                 value={userdata.description}
-//                 onChange={changeHandler}
-//                 error={!!errors.description}
-//                 helperText={errors.description}
-//                 multiline
-//                 rows={3}
-//               />
-//             </Grid>
-//             <Grid item xs={12}>
-//               <FormControl fullWidth error={!!errors.subjectId}>
-//                 <InputLabel>Subject *</InputLabel>
-//                 <Select
-//                   name="subjectId"
-//                   value={userdata.subjectId || ''}
-//                   onChange={(e) => setUserData({ ...userdata, subjectId: e.target.value })}
-//                 >
-//                   {subjects.map((subject) => (
-//                     <MenuItem key={subject.subjectId} value={subject.subjectId}>
-//                       {subject.subjectName}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//                 {errors.subjectId && <Box sx={{ color: 'red', fontSize: '0.75rem', mt: 1 }}>{errors.subjectId}</Box>}
-//               </FormControl>
-//             </Grid>
-
-           
-//             {/* PDF Upload */}
-//             <Grid item xs={12}>
-//               <TextField
-//                 fullWidth
-//                 label="PDF File"
-//                 value={userdata.fileName}
-//                 disabled
-//                 InputProps={{
-//                   endAdornment: (
-//                     <Button
-//                       variant="contained"
-//                       onClick={onFileUpload}
-//                       disabled={!selectedFile}
-//                     >
-//                       Upload
-//                     </Button>
-//                   )
-//                 }}
-//               />
-//               <input
-//                 type="file"
-//                 ref={inputRef}
-//                 style={{ display: 'none' }}
-//                 accept="application/pdf"
-//                 onChange={e => onFileChange(e, 'pdf')}
-//               />
-//               <Button
-//                 variant="outlined"
-//                 onClick={() => inputRef.current.click()}
-//                 sx={{ mt: 1 }}
-//               >
-//                 Select File
-//               </Button>
-             
-//             </Grid>
-
-//           </Grid>
-
-//           <DialogActions sx={{ mt: 2 }}>
-//             <Button onClick={() => setOpen(false)}>Cancel</Button>
-//             <Button type="submit" variant="contained">
-//               {editMode ? 'Update' : 'Save'}
-//             </Button>
-//           </DialogActions>
-//         </Box>
-//       </Dialog>
-//     </MainCard>
-//   );
-// };
-
-// export default Modules;
-import React from 'react';
+// src/views/Module/Modules.jsx
+import * as React from 'react';
 import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  TablePagination
+  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  TextField, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
+  TablePagination, TableRow, IconButton, FormControl, InputLabel, MenuItem,
+  FormHelperText, Select, ToggleButtonGroup, ToggleButton, CircularProgress, Typography
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { DeleteForever, Edit, ViewList, ViewModule } from '@mui/icons-material';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import MainCard from 'ui-component/cards/MainCard';
+import { useState, useEffect } from 'react';
+import moment from 'moment';
+import { useTheme } from '@mui/material/styles';
+import {
+  fetchModules,
+  fetchModuleById,
+  addModule,
+  updatedModule,
+  deleteModule
+} from 'views/API/ModuleApi';
+import { fetchAllSubjects } from 'views/API/SubjectApi';
+import { BaseUrl } from 'BaseUrl';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
-const CategoryCards = ({ categories, page, rowsPerPage, onEdit, onDelete, onPageChange, onRowsPerPageChange }) => {
-  const count = categories.length;
+const columns = [
+  { id: 'displayId', label: 'ID', minWidth: 50 },
+  { id: 'moduleName', label: 'Name', minWidth: 150 },
+  { id: 'description', label: 'Description', minWidth: 350 },
+  { id: 'subjectName', label: 'Subject', minWidth: 150 },
+  { id: 'file', label: 'Upload Syllabus', minWidth: 180 },
+  { id: 'createdBy', label: 'Created By', align: 'right' },
+  { id: 'updatedBy', label: 'Updated By', align: 'right' },
+  { id: 'insertedDate', label: 'Inserted Date', align: 'right' },
+  { id: 'updatedDate', label: 'Updated Date', align: 'right' },
+  { id: 'actions', label: 'Actions', align: 'right' }
+];
 
+const Modules = () => {
+  const theme = useTheme();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [subjects, setSubjects] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [viewMode, setViewMode] = useState('list');
+  const [loading, setLoading] = useState(false);
+  const [moduleId, setModuleId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const [userdata, setUserData] = useState({
+    moduleName: '',
+    description: '',
+    subjectId: '',
+    fileName: '',
+    filePath: ''
+  });
+
+  const [errors, setErrors] = useState({});
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  const headers = {
+    'Content-type': 'application/json',
+    Authorization: 'Bearer ' + (user?.accessToken || '')
+  };
+
+  const fileDownloadBase = `${BaseUrl}/file/downloadFile/?filePath=`;
+
+  // ---------- Helpers ----------
+  const safeList = (res) => {
+    if (Array.isArray(res?.data)) return res.data;
+    if (Array.isArray(res?.data?.content)) return res.data.content;
+    if (Array.isArray(res?.data?.data)) return res.data.data;
+    return [];
+  };
+
+  const getSubjectName = (m) => {
+    if (Array.isArray(m.subjectDtoList) && m.subjectDtoList.length) {
+      return m.subjectDtoList[0]?.subjectName || 'No Subject';
+    }
+    if (m.subjectDtoList && typeof m.subjectDtoList === 'object') {
+      return m.subjectDtoList.subjectName || 'No Subject';
+    }
+    return 'No Subject';
+  };
+
+  // ---------- Fetch ----------
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchModules(headers);
+      const list = safeList(res);
+      const sorted = [...list].sort((a, b) => a.moduleId - b.moduleId);
+      const tableData = sorted.map((m, idx) => ({
+        displayId: idx + 1,
+        moduleId: m.moduleId,
+        moduleName: m.moduleName,
+        description: m.description,
+        subjectName: getSubjectName(m),
+        subjectId:
+          Array.isArray(m.subjectDtoList) ? (m.subjectDtoList[0]?.subjectId || '') :
+          (m.subjectDtoList?.subjectId || ''),
+        fileName: m.fileName,
+        filePath: m.filePath,
+        insertedDate: m.insertedDate ? moment(m.insertedDate).format('L') : '',
+        updatedDate: m.updatedDate ? moment(m.updatedDate).format('L') : '',
+        createdBy: m.createdBy?.userName || 'No User',
+        updatedBy: m.updatedBy?.userName || 'No User'
+      }));
+      setModules(tableData);
+    } catch (err) {
+      console.error('Error fetching modules:', err);
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load modules', confirmButtonColor: theme.palette.primary.main });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSubjects = async () => {
+    try {
+      const res = await fetchAllSubjects(headers);
+      const list = Array.isArray(res?.data) ? res.data : (res?.data?.data || []);
+      const sorted = [...list].sort((a, b) => a.subjectName.localeCompare(b.subjectName));
+      setSubjects(sorted.map(s => ({ subjectId: s.subjectId, subjectName: s.subjectName })));
+    } catch (err) {
+      console.error('Error fetching subjects:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchSubjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
+
+  // ---------- Validation ----------
+  const validateForm = () => {
+    const newErrors = {};
+    if (!userdata.moduleName?.trim()) newErrors.moduleName = 'Enter the module name';
+    if (!userdata.description?.trim()) newErrors.description = 'Enter the description';
+    if (!userdata.subjectId) newErrors.subjectId = 'Select a subject';
+    if (!editMode && !userdata.filePath && !selectedFile) newErrors.file = 'Please upload a PDF';
+    return newErrors;
+  };
+
+  // ---------- Handlers ----------
+  const changeHandler = (e) => {
+    setUserData({ ...userdata, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: null });
+  };
+
+  const handleAddModule = () => {
+    setEditMode(false);
+    setUserData({
+      moduleName: '',
+      description: '',
+      subjectId: '',
+      fileName: '',
+      filePath: ''
+    });
+    setSelectedFile(null);
+    setErrors({});
+    setOpen(true);
+  };
+
+  const handleEdit = async (row) => {
+    setEditMode(true);
+    setOpen(true);
+    setModuleId(row.moduleId);
+
+    // Prefill immediately from row
+    setUserData({
+      moduleName: row.moduleName,
+      description: row.description,
+      subjectId: row.subjectId || '',
+      fileName: row.fileName || '',
+      filePath: row.filePath || ''
+    });
+
+    try {
+      const res = await fetchModuleById(row.moduleId, headers);
+      const det = res.data;
+      setUserData({
+        moduleName: det.moduleName || row.moduleName,
+        description: det.description || row.description,
+        subjectId:
+          Array.isArray(det.subjectDtoList) ? (det.subjectDtoList[0]?.subjectId || '') :
+          (det.subjectDtoList?.subjectId || row.subjectId || ''),
+        fileName: det.fileName || row.fileName || '',
+        filePath: det.filePath || row.filePath || ''
+      });
+    } catch (err) {
+      console.error('Error fetching module by id:', err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#03045E',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      await deleteModule(id, headers);
+      setRefreshTrigger(v => !v);
+    } catch (err) {
+      console.error('Delete failed:', err);
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Delete failed', confirmButtonColor: theme.palette.primary.main });
+    }
+  };
+
+  // File handling
+  const onFileChange = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.type !== 'application/pdf') {
+      setErrors(prev => ({ ...prev, file: 'Only PDF files are allowed' }));
+      return;
+    }
+    setSelectedFile(f);
+    setErrors(prev => ({ ...prev, file: null }));
+    setUserData(prev => ({ ...prev, fileName: f.name }));
+  };
+
+  const uploadFile = async () => {
+    if (!selectedFile) return null;
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    try {
+      const res = await axios.post(`${BaseUrl}/file/uploadFile`, formData, {
+        headers: {
+          Authorization: 'Bearer ' + (user?.accessToken || '')
+        }
+      });
+      return {
+        fileName: res.data.fileName || selectedFile.name,
+        filePath: res.data.filePath || res.data.fileDownloadUri || ''
+      };
+    } catch (err) {
+      console.error('File upload failed:', err);
+      Swal.fire({ icon: 'error', title: 'Upload failed', text: 'Please try again', confirmButtonColor: theme.palette.primary.main });
+      return null;
+    }
+  };
+
+  const handleSubmit = async () => {
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
+    let uploaded = null;
+    if (selectedFile) {
+      uploaded = await uploadFile();
+      if (!uploaded) return;
+    }
+
+    const payload = {
+      moduleName: userdata.moduleName,
+      description: userdata.description,
+ subjectDtoList: userdata.subjectId
+      ? [{
+          subjectId: userdata.subjectId,
+          subjectName: subjects.find(s => s.subjectId === userdata.subjectId)?.subjectName || ""
+        }]
+      : [],
+            fileName: uploaded?.fileName || userdata.fileName || '',
+      filePath: uploaded?.filePath || userdata.filePath || ''
+    };
+
+    try {
+      let res;
+      if (editMode) {
+        res = await updatedModule(moduleId, payload, headers);
+      } else {
+        res = await addModule(payload, headers);
+      }
+
+      const code = res?.data?.responseCode;
+      if (code === 200 || code === 201) {
+        setRefreshTrigger(v => !v);
+        setOpen(false);
+        setEditMode(false);
+        setModuleId(null);
+        setSelectedFile(null);
+        Swal.fire({ icon: 'success', title: 'Success', text: res?.data?.message || 'Operation successful', confirmButtonColor: '#03045E' });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res?.data?.errorMessage || 'Operation failed' });
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Error', text: err?.response?.data?.errorMessage || err.message || 'Something went wrong' });
+    }
+  };
+
+  // ---------- UI ----------
   return (
-    <>
-      <Grid container spacing={2}>
-        {categories
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((cat) => (
-            <Grid item xs={12} sm={6} md={4} key={cat.categoryId}>
-              <Card
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  transition: '0.3s',
-                  '&:hover': {
-                    boxShadow: 6,
-                    transform: 'translateY(-4px)',
-                  },
-                }}
-              >
-                <CardContent>
-                  <Typography
-                    variant="h4"
-                    align="center"
-                    sx={{ fontWeight: 'bold', mb: 1 }}
-                  >
-                    {cat.categoryName}
-                  </Typography>
-                  <Typography variant="body2" align="center" color="text.secondary">
-                    {cat.description}
-                  </Typography>
-                  
-                  <Grid container spacing={1} justifyContent="center" sx={{ mt: 2 }}>
-                    <Grid item>
-                      <Button variant="outlined" size="small" onClick={() => onEdit(cat.categoryId)}>
-                        ViewMore
-                      </Button>
-                    </Grid>
+    <MainCard
+      title={
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <span>Modules</span>
+          <Box display="flex" alignItems="center" gap={1}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(e, val) => val && setViewMode(val)}
+              size="small"
+            >
+              <ToggleButton value="list">
+                <ViewList />
+              </ToggleButton>
+              <ToggleButton value="card">
+                <ViewModule />
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: '#03045E', '&:hover': { opacity: 0.9 } }}
+              onClick={handleAddModule}
+            >
+              Add <AddIcon sx={{ color: '#fff', ml: 0.5 }} />
+            </Button>
+          </Box>
+        </Box>
+      }
+    >
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : viewMode === 'list' ? (
+        <Paper>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  {columns.map((c) => (
+                    <TableCell key={c.id} align={c.align} style={{ minWidth: c.minWidth }}>{c.label}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {modules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  <TableRow hover key={row.moduleId}>
+                    {columns.map((c) => (
+                      <TableCell key={c.id} align={c.align}>
+                        {c.id === 'actions' ? (
+                          <>
+                            <IconButton color="primary" onClick={() => handleEdit(row)}>
+                              <Edit />
+                            </IconButton>
+                            <IconButton color="error" onClick={() => handleDelete(row.moduleId)}>
+                              <DeleteForever />
+                            </IconButton>
+                          </>
+                        ) : c.id === 'file' ? (
+                          row.filePath ? (
+                            // <a
+                            //   href={fileDownloadBase + row.filePath}
+                            //   target="_blank"
+                            //   rel="noreferrer"
+                            //   style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#03045E' }}
+                            // >
+                            //   <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
+                            //   <Typography component="span" variant="body2" maxWidth={150}   noWrap>
+                            //     {row.fileName || 'View PDF'}
+                            //   </Typography>
+                            // </a>
+                            <a
+  href={`https://docs.google.com/viewer?url=${encodeURIComponent(fileDownloadBase + row.filePath)}&embedded=true`}
+  target="_blank"
+  rel="noreferrer"
+  style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#03045E' }}
+>
+  <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
+  <Typography component="span" variant="body2" noWrap sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+    {row.fileName || 'View PDF'}
+  </Typography>
+</a>
 
-                    <Grid item>
-                      <Button variant="outlined" size="small" onClick={() => onEdit(cat.categoryId)}>
-                        Edit
-                      </Button>
-                    </Grid>
-                    <Grid item>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={() => onDelete(cat.categoryId)}
-                      >
-                        Delete
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">No file</Typography>
+                          )
+                        ) : c.id === 'description' ? (
+                          <div style={{ textAlign: 'justify', whiteSpace: 'pre-line' }}>{row.description}</div>
+                        ) : (
+                          row[c.id] || ''
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {modules.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} align="center">
+                      No data found
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={modules.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(e, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(e) => { setRowsPerPage(+e.target.value); setPage(0); }}
+          />
+        </Paper>
+      ) : (
+        <Grid container spacing={2}>
+          {modules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((m) => (
+            <Grid item xs={12} sm={6} md={4} key={m.moduleId}>
+              <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 3, height: '100%' }}>
+                <Typography variant="h6" gutterBottom>{m.moduleName}</Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', textAlign: 'justify' }}>
+                  {m.description}
+                </Typography>
+                <Box mt={1}>
+                  <Typography variant="caption" color="text.secondary">
+                    Subject: {m.subjectName}
+                  </Typography>
+                </Box>
+                {m.filePath && (
+                  <Box mt={1} display="flex" alignItems="center">
+                    <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
+                    <a
+                      href={fileDownloadBase + m.filePath}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ textDecoration: 'none', color: '#03045E' }}
+                    >
+                      <Typography component="span" variant="body2">{m.fileName || 'View PDF'}</Typography>
+                    </a>
+                  </Box>
+                )}
+                <Box mt={2} display="flex" justifyContent="flex-end" gap={1}>
+                  <IconButton color="primary" onClick={() => handleEdit(m)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(m.moduleId)}>
+                    <DeleteForever />
+                  </IconButton>
+                </Box>
+              </Paper>
             </Grid>
           ))}
-      </Grid>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={count}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-      />
-    </>
+          {modules.length === 0 && (
+            <Grid item xs={12}><Typography align="center">No modules</Typography></Grid>
+          )}
+        </Grid>
+      )}
+
+      {/* Add/Edit Dialog */}
+      <Dialog
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          setEditMode(false);
+          setSelectedFile(null);
+        }}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{editMode ? 'Edit Module' : 'Add Module'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Module Name"
+            name="moduleName"
+            value={userdata.moduleName}
+            onChange={changeHandler}
+            error={!!errors.moduleName}
+            helperText={errors.moduleName}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            name="description"
+            value={userdata.description}
+            onChange={changeHandler}
+            error={!!errors.description}
+            helperText={errors.description}
+            fullWidth
+            multiline
+            rows={3}
+          />
+          <FormControl fullWidth margin="dense" error={!!errors.subjectId}>
+            <InputLabel>Subject</InputLabel>
+            <Select
+              name="subjectId"
+              value={userdata.subjectId}
+              label="Subject"
+              onChange={changeHandler}
+            >
+              {subjects.map(s => (
+                <MenuItem key={s.subjectId} value={s.subjectId}>{s.subjectName}</MenuItem>
+              ))}
+            </Select>
+            {errors.subjectId && <FormHelperText>{errors.subjectId}</FormHelperText>}
+          </FormControl>
+
+          <Box mt={2} display="flex" alignItems="center" gap={2}>
+            <Button variant="outlined" component="label">
+              Upload PDF
+              <input
+                type="file"
+                hidden
+                accept="application/pdf"
+                onChange={onFileChange}
+              />
+            </Button>
+
+            {/* Selected file (new) */}
+            {selectedFile ? (
+              <Box display="flex" alignItems="center" gap={1}>
+                <PictureAsPdfIcon sx={{ color: 'red' }} />
+                <Typography variant="body2">{selectedFile.name}</Typography>
+              </Box>
+            ) : userdata.fileName ? (
+              // Existing file (when editing)
+              <Box display="flex" alignItems="center" gap={1}>
+                <PictureAsPdfIcon sx={{ color: 'red' }} />
+                <a
+                  href={userdata.filePath ? (fileDownloadBase + userdata.filePath) : '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ textDecoration: 'none', color: '#03045E' }}
+                >
+                  <Typography variant="body2">Current: {userdata.fileName}</Typography>
+                </a>
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">No file selected</Typography>
+            )}
+          </Box>
+
+          {errors.file && <Typography variant="caption" color="error">{errors.file}</Typography>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setOpen(false);
+            setEditMode(false);
+            setSelectedFile(null);
+          }}>Cancel</Button>
+          <Button variant="contained" onClick={handleSubmit}>
+            {editMode ? 'Update' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </MainCard>
   );
 };
 
-export default CategoryCards;
+export default Modules;

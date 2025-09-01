@@ -39,13 +39,13 @@ export const fetchCourses = async (headers) => {
   };
 
 
-     export const fetchAllBranches = async (headers) => {
-    return await axios({
-      method: 'GET',
-      url: `${BaseUrl}/branch/v1/queryAllBranchs`,
-      headers: headers
-    });
-  };
+  //    export const fetchAllBranches = async (headers) => {
+  //   return await axios({
+  //     method: 'GET',
+  //     url: `${BaseUrl}/branch/v1/queryAllBranchs`,
+  //     headers: headers
+  //   });
+  // };
 
   // Add new course
 // export const addCourse = async (data, headers) => {

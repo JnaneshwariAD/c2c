@@ -68,6 +68,7 @@ export const updatedTopic = async (updatedData, headers) => {
 };
 
 export const deleteTopic = async (id, headers) => {
+    
     try {
         const res = await axios({
             method: 'DELETE',

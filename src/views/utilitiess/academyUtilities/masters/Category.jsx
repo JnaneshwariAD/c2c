@@ -419,7 +419,7 @@ import {
 import CategoryCards from './CategoryCards';
 
 const columns = [
-  { id: 'categoryId', label: 'ID' },
+  { id: 'serialId', label: 'ID' }, // Display serial number
   { id: 'categoryName', label: 'Name' },
   { id: 'description', label: 'Description' },
   { id: 'createdBy', label: 'Created By' },
@@ -447,24 +447,48 @@ const Category = () => {
     Authorization: 'Bearer ' + user.accessToken
   };
 
+  // const fetchData = async () => {
+  //   try {
+  //     const res = await fetchCategories(headers);
+  //     const fetchedData = res.data.content || [];
+  //     const tableData = fetchedData.map((p) => ({
+  //       categoryId: p.categoryId,
+  //       categoryName: p.categoryName,
+  //       description: p.description,
+  //       insertedDate: moment(p.insertedDate).format('L'),
+  //       updatedDate: moment(p.updatedDate).format('L'),
+  //       createdBy: p.createdBy ? p.createdBy.userName : 'No User',
+  //       updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
+  //     }));
+  //     setCategories(tableData);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+
   const fetchData = async () => {
-    try {
-      const res = await fetchCategories(headers);
-      const fetchedData = res.data.content || [];
-      const tableData = fetchedData.map((p) => ({
-        categoryId: p.categoryId,
-        categoryName: p.categoryName,
-        description: p.description,
-        insertedDate: moment(p.insertedDate).format('L'),
-        updatedDate: moment(p.updatedDate).format('L'),
-        createdBy: p.createdBy ? p.createdBy.userName : 'No User',
-        updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-      }));
-      setCategories(tableData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  try {
+    const res = await fetchCategories(headers);
+    const fetchedData = res.data.content || [];
+    
+    // Sort by categoryId (ascending)
+    const sortedData = [...fetchedData].sort((a, b) => a.categoryId - b.categoryId);
+
+    const tableData = sortedData.map((p, index) => ({
+      serialId: index + 1, // Serial number for display
+      categoryId: p.categoryId, // Actual database ID for operations
+      categoryName: p.categoryName,
+      description: p.description,
+      insertedDate: moment(p.insertedDate).format('L'),
+      updatedDate: moment(p.updatedDate).format('L'),
+      createdBy: p.createdBy ? p.createdBy.userName : 'No User',
+      updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
+    }));
+    setCategories(tableData);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
 
   useEffect(() => {
     fetchData();
@@ -505,14 +529,14 @@ const Category = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Delete this category?')) {
+    // if (window.confirm('Delete this category?')) {
       try {
         await deleteCategory(id, headers);
         setRefreshTrigger(!refreshTrigger);
       } catch (error) {
         console.error('Error deleting category:', error);
       }
-    }
+    // }
   };
 
   const postData = async (e) => {
@@ -591,20 +615,35 @@ const Category = () => {
                 {categories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                   <TableRow key={row.categoryId}>
                     {columns.map((col) => (
+                      // <TableCell key={col.id}>
+                      //   {col.id === 'actions' ? (
+                      //     <>
+                      //       <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
+                      //         <Edit />
+                      //       </IconButton>
+                      //       <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
+                      //         <DeleteForever />
+                      //       </IconButton>
+                      //     </>
+                      //   ) : (
+                      //     row[col.id]
+                      //   )}
+                      // </TableCell>
+
                       <TableCell key={col.id}>
-                        {col.id === 'actions' ? (
-                          <>
-                            <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
-                              <Edit />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
-                              <DeleteForever />
-                            </IconButton>
-                          </>
-                        ) : (
-                          row[col.id]
-                        )}
-                      </TableCell>
+  {col.id === 'actions' ? (
+    <>
+      <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
+        <Edit />
+      </IconButton>
+      <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
+        <DeleteForever />
+      </IconButton>
+    </>
+  ) : (
+    row[col.id]
+  )}
+</TableCell>
                     ))}
                   </TableRow>
                 ))}
