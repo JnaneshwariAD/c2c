@@ -95,8 +95,8 @@
 //             ) : (
 //               <img src={ImageUrl + p.universityPicPath} alt={p.universityPicName} style={{ width: 100, height: 50 }} />
 //             ),
-//           insertedDate: moment(p.insertedDate).format('L'),
-//           updatedDate: moment(p.updatedDate).format('L'),
+//           insertedDate: p.insertedDate ? moment(p.insertedDate).format('L') : 'N/A',
+//           updatedDate: p.updatedDate ? moment(p.updatedDate).format('L') : 'N/A',
 //           createdBy: p.createdBy ? p.createdBy.userName : 'No User',
 //           updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
 //         }))
@@ -126,7 +126,9 @@
 
 //     const dataToPost = {
 //       ...userdata,
-//       createdBy: { userId: user.userId }
+//       createdBy: { userId: user.userId },
+//       insertedDate: new Date().toISOString(), // add this
+//       updatedDate: new Date().toISOString()   // add this
 //     };
 
 //     // console.log("dataToPost "+dataToPost);
@@ -638,7 +640,8 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 
 const columns = [
-  { id: 'serialNo', label: 'ID', align: 'center', minWidth: 50 },
+  // { id: 'serialNo', label: 'ID', align: 'center', minWidth: 50 },
+  { id: 'universityId', label: 'ID', align: 'center', minWidth: 100, hide: true },
   { id: 'universityName', label: 'Name', align: 'center' },
   { id: 'description', label: 'Description', minWidth: 100 },
   { id: 'file', label: 'Upload Logo', align: 'center' },
@@ -691,6 +694,7 @@ const University = () => {
     try {
       const res = await fetchUniversities(headers);
       const fetchedData = res.data.content;
+console.log(fetchedData);
 
       if (fetchedData) {
         // Sort by universityId in ascending order
@@ -707,10 +711,13 @@ const University = () => {
             ) : (
               <img src={ImageUrl + p.universityPicPath} alt={p.universityPicName} style={{ width: 100, height: 50 }} />
             ),
-          insertedDate: moment(p.insertedDate).format('L'),
-          updatedDate: moment(p.updatedDate).format('L'),
+           
+          insertedDate: p.insertedDate ? moment(p.insertedDate).format('L') : 'N/A',
+          updatedDate: p.updatedDate ? moment(p.updatedDate).format('L') : 'N/A',
           createdBy: p.createdBy ? p.createdBy.userName : 'No User',
           updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
+
+          
         }));
         
         setAdvertisement(tableData);
@@ -737,7 +744,9 @@ const University = () => {
 
     const dataToPost = {
       ...userdata,
-      createdBy: { userId: user.userId }
+      createdBy: { userId: user.userId },
+      insertedDate: new Date().toISOString(), // add this
+      updatedDate: new Date().toISOString()   // add this
     };
 
     try {
@@ -1059,7 +1068,7 @@ const University = () => {
               <TextField
                 fullWidth
                 margin="normal"
-                label="File Name"
+                label="Upload College Logo"
                 name="universityPicName"
                 value={userdata.universityPicName}
                 disabled

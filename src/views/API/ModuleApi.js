@@ -176,7 +176,7 @@ export const fetchModules = async (headers) => {
     url: `${BaseUrl}/module/v1/getAllModuleByPagination/{pageNumber}/{pageSize}?pageNumber=0&pageSize=100`,
     headers: headers
   });
-};
+};  
 
 // Fetch all modules
 export const fetchAllModules = async (headers) => {

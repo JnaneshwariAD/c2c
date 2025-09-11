@@ -25,10 +25,12 @@ import { BaseUrl } from 'BaseUrl';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
+import ModuleCards from './ModuleCards';
+
 const columns = [
   { id: 'displayId', label: 'ID', minWidth: 50 },
-  { id: 'moduleName', label: 'Name', minWidth: 150 },
-  { id: 'description', label: 'Description', minWidth: 350 },
+  { id: 'moduleName', label: 'Name', minWidth: 100 },
+  { id: 'description', label: 'Description', minWidth: 400 },
   { id: 'subjectName', label: 'Subject', minWidth: 150 },
   { id: 'file', label: 'Upload Syllabus', minWidth: 180 },
   { id: 'createdBy', label: 'Created By', align: 'right' },
@@ -266,37 +268,64 @@ const Modules = () => {
       if (!uploaded) return;
     }
 
+    // Prepare payload according to backend structure
     const payload = {
       moduleName: userdata.moduleName,
       description: userdata.description,
- subjectDtoList: userdata.subjectId
-      ? [{
-          subjectId: userdata.subjectId,
-          subjectName: subjects.find(s => s.subjectId === userdata.subjectId)?.subjectName || ""
-        }]
-      : [],
-            fileName: uploaded?.fileName || userdata.fileName || '',
-      filePath: uploaded?.filePath || userdata.filePath || ''
+      subjectDtoList: userdata.subjectId
+        ? [{
+            subjectId: userdata.subjectId,
+            subjectName: subjects.find(s => s.subjectId === userdata.subjectId)?.subjectName || ""
+          }]
+        : [],
+      fileName: uploaded?.fileName || userdata.fileName || '',
+      filePath: uploaded?.filePath || userdata.filePath || '',
+      createdBy: editMode ? undefined : {
+        userId: user.userId || 0,
+        userName: user.userName || 'string',
+        fullName: user.fullName || 'string',
+        mobileNumber: user.mobileNumber || 'string'
+      },
+      updatedBy: {
+        userId: user.userId || 0,
+        userName: user.userName || 'string',
+        fullName: user.fullName || 'string',
+        mobileNumber: user.mobileNumber || 'string'
+      },
+      insertedDate: editMode ? undefined : moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
+      updatedDate: moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ')
     };
 
     try {
       let res;
       if (editMode) {
         res = await updatedModule(moduleId, payload, headers);
+        // For update, res is the full Axios response
+        const code = res?.data?.responseCode;
+        if (code === 200 || code === 201) {
+          setRefreshTrigger(v => !v);
+          setOpen(false);
+          setEditMode(false);
+          setModuleId(null);
+          setSelectedFile(null);
+          Swal.fire({ icon: 'success', title: 'Success', text: res?.data?.message || 'Operation successful', confirmButtonColor: '#03045E' });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Error', text: res?.data?.errorMessage || 'Operation failed' });
+        }
       } else {
         res = await addModule(payload, headers);
-      }
-
-      const code = res?.data?.responseCode;
-      if (code === 200 || code === 201) {
-        setRefreshTrigger(v => !v);
-        setOpen(false);
-        setEditMode(false);
-        setModuleId(null);
-        setSelectedFile(null);
-        Swal.fire({ icon: 'success', title: 'Success', text: res?.data?.message || 'Operation successful', confirmButtonColor: '#03045E' });
-      } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res?.data?.errorMessage || 'Operation failed' });
+        // For add, res is just res.data, so check res.responseCode
+        const code = res?.responseCode;
+        if (code === 200 || code === 201) {
+          setRefreshTrigger(v => !v);
+          setOpen(false);
+          setEditMode(false);
+          setModuleId(null);
+          setSelectedFile(null);
+          Swal.fire({ icon: 'success', title: 'Success', text: res?.message || 'Operation successful', confirmButtonColor: '#03045E' });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Error', text: res?.errorMessage || 'Operation failed' });
+        }
       }
     } catch (err) {
       console.error(err);
@@ -335,7 +364,7 @@ const Modules = () => {
         </Box>
       }
     >
-      {loading ? (
+      {/* {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
         </Box>
@@ -366,29 +395,17 @@ const Modules = () => {
                           </>
                         ) : c.id === 'file' ? (
                           row.filePath ? (
-                            // <a
-                            //   href={fileDownloadBase + row.filePath}
-                            //   target="_blank"
-                            //   rel="noreferrer"
-                            //   style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#03045E' }}
-                            // >
-                            //   <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
-                            //   <Typography component="span" variant="body2" maxWidth={150}   noWrap>
-                            //     {row.fileName || 'View PDF'}
-                            //   </Typography>
-                            // </a>
                             <a
-  href={`https://docs.google.com/viewer?url=${encodeURIComponent(fileDownloadBase + row.filePath)}&embedded=true`}
-  target="_blank"
-  rel="noreferrer"
-  style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#03045E' }}
->
-  <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
-  <Typography component="span" variant="body2" noWrap sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-    {row.fileName || 'View PDF'}
-  </Typography>
-</a>
-
+                              href={`https://docs.google.com/viewer?url=${encodeURIComponent(fileDownloadBase + row.filePath)}&embedded=true`}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#03045E' }}
+                            >
+                              <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
+                              <Typography component="span" variant="body2" noWrap sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {row.fileName || 'View PDF'}
+                              </Typography>
+                            </a>
                           ) : (
                             <Typography variant="body2" color="text.secondary">No file</Typography>
                           )
@@ -463,7 +480,93 @@ const Modules = () => {
             <Grid item xs={12}><Typography align="center">No modules</Typography></Grid>
           )}
         </Grid>
-      )}
+      ) */}
+
+{loading ? (
+  <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+    <CircularProgress />
+  </Box>
+) : viewMode === 'list' ? (
+  <Paper>
+    {/* ---- TABLE VIEW ---- */}
+    <TableContainer sx={{ maxHeight: 440 }}>
+      <Table stickyHeader>
+        <TableHead>
+          <TableRow>
+            {columns.map((c) => (
+              <TableCell key={c.id} align={c.align} style={{ minWidth: c.minWidth }}>{c.label}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {modules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+            <TableRow hover key={row.moduleId}>
+              {columns.map((c) => (
+                <TableCell key={c.id} align={c.align}>
+                  {c.id === 'actions' ? (
+                    <>
+                      <IconButton color="primary" onClick={() => handleEdit(row)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDelete(row.moduleId)}>
+                        <DeleteForever />
+                      </IconButton>
+                    </>
+                  ) : c.id === 'file' ? (
+                    row.filePath ? (
+                      <a
+                        href={`https://docs.google.com/viewer?url=${encodeURIComponent(fileDownloadBase + row.filePath)}&embedded=true`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#03045E' }}
+                      >
+                        <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
+                        <Typography component="span" variant="body2" noWrap sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {row.fileName || 'View PDF'}
+                        </Typography>
+                      </a>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">No file</Typography>
+                    )
+                  ) : c.id === 'description' ? (
+                    <div style={{ textAlign: 'justify', whiteSpace: 'pre-line' }}>{row.description}</div>
+                  ) : (
+                    row[c.id] || ''
+                  )}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+          {modules.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={columns.length} align="center">
+                No data found
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    <TablePagination
+      rowsPerPageOptions={[5, 10, 25]}
+      component="div"
+      count={modules.length}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={(e, newPage) => setPage(newPage)}
+      onRowsPerPageChange={(e) => { setRowsPerPage(+e.target.value); setPage(0); }}
+    />
+  </Paper>
+) : (
+  <ModuleCards
+    modules={modules}
+    page={page}
+    rowsPerPage={rowsPerPage}
+    handleEdit={handleEdit}
+    handleDelete={handleDelete}
+  />
+)}
+
 
       {/* Add/Edit Dialog */}
       <Dialog
@@ -516,12 +619,21 @@ const Modules = () => {
           </FormControl>
 
           <Box mt={2} display="flex" alignItems="center" gap={2}>
-            <Button variant="outlined" component="label">
+            <Button variant="outlined" component="label"
+               sx={{
+      borderColor: '#03045E',
+      color: '#03045E',
+      '&:hover': {
+        borderColor: '#03045E',
+        backgroundColor: '#f0f8ff'
+      }
+    }}
+            >
               Upload PDF
               <input
                 type="file"
                 hidden
-                accept="application/pdf"
+                accept="application/*"
                 onChange={onFileChange}
               />
             </Button>
@@ -557,8 +669,18 @@ const Modules = () => {
             setOpen(false);
             setEditMode(false);
             setSelectedFile(null);
-          }}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit}>
+          }} 
+          sx={{ color: "#03045E" }}
+          >Cancel</Button>
+          <Button variant="contained"  onClick={handleSubmit} 
+          sx={{
+              backgroundColor: "#03045E",
+              '&:hover': {
+                backgroundColor: "#03045E",
+                opacity: 0.9
+              }
+            }}
+          >
             {editMode ? 'Update' : 'Save'}
           </Button>
         </DialogActions>

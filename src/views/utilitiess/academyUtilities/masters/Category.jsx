@@ -379,6 +379,345 @@
 // export default Category;
 
 // src/views/Category/Category.jsx
+// import * as React from 'react';
+// import {
+//   Paper,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TablePagination,
+//   TableRow,
+//   Grid,
+//   Box,
+//   Button,
+//   Dialog,
+//   DialogActions,
+//   DialogTitle,
+//   TextField,
+//   IconButton,
+//   ToggleButtonGroup,
+//   ToggleButton
+// } from '@mui/material';
+// import AddIcon from '@mui/icons-material/Add';
+// import { DeleteForever, Edit, ViewList, ViewModule } from '@mui/icons-material';
+// import MainCard from 'ui-component/cards/MainCard';
+// import { gridSpacing } from 'store/constant';
+// import { useState, useEffect } from 'react';
+// import moment from 'moment';
+
+// import {
+//   addCategory,
+//   deleteCategory,
+//   fetchCategories,
+//   fetchCategoryById,
+//   updatedCategory
+// } from 'views/API/CategoryApi';
+
+// // ✅ Import CategoryCards
+// import CategoryCards from './CategoryCards';
+
+// const columns = [
+//   { id: 'serialId', label: 'ID' }, // Display serial number
+//   { id: 'categoryName', label: 'Name' },
+//   { id: 'description', label: 'Description' },
+//   { id: 'createdBy', label: 'Created By' },
+//   { id: 'updatedBy', label: 'Updated By' },
+//   { id: 'insertedDate', label: 'Inserted Date' },
+//   { id: 'updatedDate', label: 'Updated Date' },
+//   { id: 'actions', label: 'Actions' }
+// ];
+
+// const Category = () => {
+//   const [page, setPage] = useState(0);
+//   const [rowsPerPage, setRowsPerPage] = useState(10);
+//   const [categories, setCategories] = useState([]);
+//   const [open, setOpen] = useState(false);
+//   const [editMode, setEditMode] = useState(false);
+//   const [viewMode, setViewMode] = useState('list'); // ✅ list / card toggle
+//   const [userdata, setUserData] = useState({ categoryName: '', description: '' });
+//   const [errors, setErrors] = useState({});
+//   const [refreshTrigger, setRefreshTrigger] = useState(false);
+//   const [categoryId, setCategoryId] = useState(null);
+
+//   const user = JSON.parse(sessionStorage.getItem('user'));
+//   const headers = {
+//     'Content-type': 'application/json',
+//     Authorization: 'Bearer ' + user.accessToken
+//   };
+
+//   // const fetchData = async () => {
+//   //   try {
+//   //     const res = await fetchCategories(headers);
+//   //     const fetchedData = res.data.content || [];
+//   //     const tableData = fetchedData.map((p) => ({
+//   //       categoryId: p.categoryId,
+//   //       categoryName: p.categoryName,
+//   //       description: p.description,
+//   //       insertedDate: moment(p.insertedDate).format('L'),
+//   //       updatedDate: moment(p.updatedDate).format('L'),
+//   //       createdBy: p.createdBy ? p.createdBy.userName : 'No User',
+//   //       updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
+//   //     }));
+//   //     setCategories(tableData);
+//   //   } catch (error) {
+//   //     console.error('Error fetching data:', error);
+//   //   }
+//   // };
+
+//   const fetchData = async () => {
+//   try {
+//     const res = await fetchCategories(headers);
+//     const fetchedData = res.data.content || [];
+    
+//     // Sort by categoryId (ascending)
+//     const sortedData = [...fetchedData].sort((a, b) => a.categoryId - b.categoryId);
+
+//     const tableData = sortedData.map((p, index) => ({
+//       serialId: index + 1, // Serial number for display
+//       categoryId: p.categoryId, // Actual database ID for operations
+//       categoryName: p.categoryName,
+//       description: p.description,
+//       insertedDate: moment(p.insertedDate).format('L'),
+//       updatedDate: moment(p.updatedDate).format('L'),
+//       createdBy: p.createdBy ? p.createdBy.userName : 'No User',
+//       updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
+//     }));
+//     setCategories(tableData);
+//   } catch (error) {
+//     console.error('Error fetching data:', error);
+//   }
+// };
+
+//   useEffect(() => {
+//     fetchData();
+//   }, [refreshTrigger]);
+
+//   const validateForm = () => {
+//     const newErrors = {};
+//     if (!userdata.categoryName.trim()) newErrors.categoryName = 'Enter category name';
+//     if (!userdata.description.trim()) newErrors.description = 'Enter description';
+//     return newErrors;
+//   };
+
+//   const changeHandler = (e) => {
+//     setUserData({
+//       ...userdata,
+//       [e.target.name]: e.target.value
+//     });
+//     setErrors({ ...errors, [e.target.name]: '' });
+//   };
+
+//   const handleAdd = () => {
+//     setEditMode(false);
+//     setUserData({ categoryName: '', description: '' });
+//     setOpen(true);
+//   };
+
+//   const handleEdit = async (id) => {
+//     setEditMode(true);
+//     setOpen(true);
+//     try {
+//       const res = await fetchCategoryById(id, headers);
+//       const det = res.data;
+//       setCategoryId(det.categoryId);
+//       setUserData({ categoryName: det.categoryName, description: det.description });
+//     } catch (error) {
+//       console.error('Error fetching category details:', error);
+//     }
+//   };
+
+//   const handleDelete = async (id) => {
+//     // if (window.confirm('Delete this category?')) {
+//       try {
+//         await deleteCategory(id, headers);
+//         setRefreshTrigger(!refreshTrigger);
+//       } catch (error) {
+//         console.error('Error deleting category:', error);
+//       }
+//     // }
+//   };
+
+//   const postData = async (e) => {
+//     e.preventDefault();
+//     const formErrors = validateForm();
+//     if (Object.keys(formErrors).length > 0) {
+//       setErrors(formErrors);
+//       return;
+//     }
+//     const dataToPost = { ...userdata, createdBy: { userId: user.userId } };
+//     try {
+//       await addCategory(dataToPost, headers);
+//       setRefreshTrigger(!refreshTrigger);
+//       setOpen(false);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   };
+
+//   const updateData = async (e) => {
+//     e.preventDefault();
+//     const updatedDataPayload = {
+//       categoryId,
+//       categoryName: userdata.categoryName,
+//       description: userdata.description,
+//       updatedBy: { userId: user.userId }
+//     };
+//     try {
+//       await updatedCategory(updatedDataPayload, headers);
+//       setRefreshTrigger(!refreshTrigger);
+//       setOpen(false);
+//       setEditMode(false);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   };
+
+//   return (
+//     <MainCard
+//       title={
+//         <Box display="flex" justifyContent="space-between" alignItems="center">
+//           <span>Category</span>
+//           <Box display="flex" alignItems="center" gap={1}>
+//             <ToggleButtonGroup
+//               value={viewMode}
+//               exclusive
+//               onChange={(e, val) => val && setViewMode(val)}
+//               size="small"
+//             >
+//               <ToggleButton value="list">
+//                 <ViewList />
+//               </ToggleButton>
+//               <ToggleButton value="card">
+//                 <ViewModule />
+//               </ToggleButton>
+//             </ToggleButtonGroup>
+//             <Button variant="contained" onClick={handleAdd}>
+//               Add <AddIcon />
+//             </Button>
+//           </Box>
+//         </Box>
+//       }
+//     >
+//       {viewMode === 'list' ? (
+//         <Paper>
+//           <TableContainer sx={{ maxHeight: 440 }}>
+//             <Table stickyHeader>
+//               <TableHead>
+//                 <TableRow>
+//                   {columns.map((col) => (
+//                     <TableCell key={col.id}>{col.label}</TableCell>
+//                   ))}
+//                 </TableRow>
+//               </TableHead>
+//               <TableBody>
+//                 {categories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+//                   <TableRow key={row.categoryId}>
+//                     {columns.map((col) => (
+//                       // <TableCell key={col.id}>
+//                       //   {col.id === 'actions' ? (
+//                       //     <>
+//                       //       <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
+//                       //         <Edit />
+//                       //       </IconButton>
+//                       //       <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
+//                       //         <DeleteForever />
+//                       //       </IconButton>
+//                       //     </>
+//                       //   ) : (
+//                       //     row[col.id]
+//                       //   )}
+//                       // </TableCell>
+
+//                       <TableCell key={col.id}>
+//   {col.id === 'actions' ? (
+//     <>
+//       <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
+//         <Edit />
+//       </IconButton>
+//       <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
+//         <DeleteForever />
+//       </IconButton>
+//     </>
+//   ) : (
+//     row[col.id]
+//   )}
+// </TableCell>
+//                     ))}
+//                   </TableRow>
+//                 ))}
+//               </TableBody>
+//             </Table>
+//           </TableContainer>
+//           <TablePagination
+//             rowsPerPageOptions={[10, 25]}
+//             component="div"
+//             count={categories.length}
+//             rowsPerPage={rowsPerPage}
+//             page={page}
+//             onPageChange={(e, newPage) => setPage(newPage)}
+//             onRowsPerPageChange={(e) => {
+//               setRowsPerPage(+e.target.value);
+//               setPage(0);
+//             }}
+//           />
+//         </Paper>
+//       ) : (
+//         <CategoryCards
+//           categories={categories}
+//           page={page}
+//           rowsPerPage={rowsPerPage}
+//           onEdit={handleEdit}
+//           onDelete={handleDelete}
+//         />
+//       )}
+
+//       {/* Add/Edit Dialog */}
+//       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
+//         <DialogTitle>{editMode ? 'Edit Category' : 'Add Category'}</DialogTitle>
+//         <Box component="form" onSubmit={editMode ? updateData : postData} sx={{ p: 3 }}>
+//           <Grid container spacing={2}>
+//             <Grid item xs={12}>
+//               <TextField
+//                 fullWidth
+//                 label="Category Name"
+//                 name="categoryName"
+//                 value={userdata.categoryName}
+//                 onChange={changeHandler}
+//                 error={!!errors.categoryName}
+//                 helperText={errors.categoryName}
+//               />
+//             </Grid>
+//             <Grid item xs={12}>
+//               <TextField
+//                 fullWidth
+//                 label="Description"
+//                 name="description"
+//                 value={userdata.description}
+//                 onChange={changeHandler}
+//                 error={!!errors.description}
+//                 helperText={errors.description}
+//                 multiline
+//                 rows={3}
+//               />
+//             </Grid>
+//           </Grid>
+//           <DialogActions sx={{ mt: 2 }}>
+//             <Button onClick={() => setOpen(false)}>Cancel</Button>
+//             <Button type="submit" variant="contained">
+//               {editMode ? 'Update' : 'Save'}
+//             </Button>
+//           </DialogActions>
+//         </Box>
+//       </Dialog>
+//     </MainCard>
+//   );
+// };
+
+// export default Category;
+
+// src/views/Category/Category.jsx
 import * as React from 'react';
 import {
   Paper,
@@ -403,7 +742,6 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { DeleteForever, Edit, ViewList, ViewModule } from '@mui/icons-material';
 import MainCard from 'ui-component/cards/MainCard';
-import { gridSpacing } from 'store/constant';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 
@@ -419,7 +757,7 @@ import {
 import CategoryCards from './CategoryCards';
 
 const columns = [
-  { id: 'serialId', label: 'ID' }, // Display serial number
+  { id: 'serialId', label: 'ID' },
   { id: 'categoryName', label: 'Name' },
   { id: 'description', label: 'Description' },
   { id: 'createdBy', label: 'Created By' },
@@ -435,10 +773,9 @@ const Category = () => {
   const [categories, setCategories] = useState([]);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [viewMode, setViewMode] = useState('list'); // ✅ list / card toggle
+  const [viewMode, setViewMode] = useState('list');
   const [userdata, setUserData] = useState({ categoryName: '', description: '' });
   const [errors, setErrors] = useState({});
-  const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [categoryId, setCategoryId] = useState(null);
 
   const user = JSON.parse(sessionStorage.getItem('user'));
@@ -447,52 +784,30 @@ const Category = () => {
     Authorization: 'Bearer ' + user.accessToken
   };
 
-  // const fetchData = async () => {
-  //   try {
-  //     const res = await fetchCategories(headers);
-  //     const fetchedData = res.data.content || [];
-  //     const tableData = fetchedData.map((p) => ({
-  //       categoryId: p.categoryId,
-  //       categoryName: p.categoryName,
-  //       description: p.description,
-  //       insertedDate: moment(p.insertedDate).format('L'),
-  //       updatedDate: moment(p.updatedDate).format('L'),
-  //       createdBy: p.createdBy ? p.createdBy.userName : 'No User',
-  //       updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-  //     }));
-  //     setCategories(tableData);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
-
   const fetchData = async () => {
-  try {
-    const res = await fetchCategories(headers);
-    const fetchedData = res.data.content || [];
-    
-    // Sort by categoryId (ascending)
-    const sortedData = [...fetchedData].sort((a, b) => a.categoryId - b.categoryId);
-
-    const tableData = sortedData.map((p, index) => ({
-      serialId: index + 1, // Serial number for display
-      categoryId: p.categoryId, // Actual database ID for operations
-      categoryName: p.categoryName,
-      description: p.description,
-      insertedDate: moment(p.insertedDate).format('L'),
-      updatedDate: moment(p.updatedDate).format('L'),
-      createdBy: p.createdBy ? p.createdBy.userName : 'No User',
-      updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
-    }));
-    setCategories(tableData);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-};
+    try {
+      const res = await fetchCategories(headers);
+      const fetchedData = res.data.content || [];
+      const sortedData = [...fetchedData].sort((a, b) => a.categoryId - b.categoryId);
+      const tableData = sortedData.map((p, index) => ({
+        serialId: index + 1,
+        categoryId: p.categoryId,
+        categoryName: p.categoryName,
+        description: p.description,
+        insertedDate: moment(p.insertedDate).format('L'),
+        updatedDate: moment(p.updatedDate).format('L'),
+        createdBy: p.createdBy ? p.createdBy.userName : 'No User',
+        updatedBy: p.updatedBy ? p.updatedBy.userName : 'No User'
+      }));
+      setCategories(tableData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
     fetchData();
-  }, [refreshTrigger]);
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -502,16 +817,14 @@ const Category = () => {
   };
 
   const changeHandler = (e) => {
-    setUserData({
-      ...userdata,
-      [e.target.name]: e.target.value
-    });
+    setUserData({ ...userdata, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: '' });
   };
 
   const handleAdd = () => {
     setEditMode(false);
     setUserData({ categoryName: '', description: '' });
+    
     setOpen(true);
   };
 
@@ -529,16 +842,15 @@ const Category = () => {
   };
 
   const handleDelete = async (id) => {
-    // if (window.confirm('Delete this category?')) {
-      try {
-        await deleteCategory(id, headers);
-        setRefreshTrigger(!refreshTrigger);
-      } catch (error) {
-        console.error('Error deleting category:', error);
-      }
-    // }
+    try {
+      await deleteCategory(id, headers);
+      setCategories(categories.filter((cat) => cat.categoryId !== id));
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
   };
 
+  // ✅ Add category
   const postData = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
@@ -546,27 +858,73 @@ const Category = () => {
       setErrors(formErrors);
       return;
     }
-    const dataToPost = { ...userdata, createdBy: { userId: user.userId } };
+
+    const dataToPost = {
+      categoryName: userdata.categoryName,
+      description: userdata.description,
+      createdBy: {
+        fullName: user.fullName,
+        mobileNumber: user.mobileNumber,
+        userId: user.userId,
+        userName: user.userName
+      }
+    };
+
     try {
-      await addCategory(dataToPost, headers);
-      setRefreshTrigger(!refreshTrigger);
+      const res = await addCategory(dataToPost, headers);
+
+      console.log(res);
+
+      const newCategory = {
+        // serialId: categories.length + 1,
+        categoryId: res.data.categoryId,
+        categoryName: res.data.categoryName,
+        description: res.data.description,
+        createdBy: user.userName,
+        updatedBy: user.userName,
+        insertedDate: moment(res.data.insertedDate).format('L'),
+        updatedDate: moment(res.data.updatedDate).format('L')
+      };
+
+      setCategories((prev) => [...prev, newCategory]);
       setOpen(false);
     } catch (error) {
       console.error(error);
     }
   };
 
+  // ✅ Update category
   const updateData = async (e) => {
     e.preventDefault();
     const updatedDataPayload = {
       categoryId,
       categoryName: userdata.categoryName,
       description: userdata.description,
-      updatedBy: { userId: user.userId }
+      updatedBy: {
+        fullName: user.fullName,
+        mobileNumber: user.mobileNumber,
+        userId: user.userId,
+        userName: user.userName
+      }
     };
+
     try {
-      await updatedCategory(updatedDataPayload, headers);
-      setRefreshTrigger(!refreshTrigger);
+      const res = await updatedCategory(updatedDataPayload, headers);
+
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.categoryId === categoryId
+            ? {
+                ...cat,
+                categoryName: userdata.categoryName,
+                description: userdata.description,
+                updatedBy: user.userName,
+                updatedDate: moment().format('L')
+              }
+            : cat
+        )
+      );
+
       setOpen(false);
       setEditMode(false);
     } catch (error) {
@@ -612,41 +970,34 @@ const Category = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {categories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                  <TableRow key={row.categoryId}>
-                    {columns.map((col) => (
-                      // <TableCell key={col.id}>
-                      //   {col.id === 'actions' ? (
-                      //     <>
-                      //       <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
-                      //         <Edit />
-                      //       </IconButton>
-                      //       <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
-                      //         <DeleteForever />
-                      //       </IconButton>
-                      //     </>
-                      //   ) : (
-                      //     row[col.id]
-                      //   )}
-                      // </TableCell>
-
-                      <TableCell key={col.id}>
-  {col.id === 'actions' ? (
-    <>
-      <IconButton onClick={() => handleEdit(row.categoryId)} color="primary">
-        <Edit />
-      </IconButton>
-      <IconButton onClick={() => handleDelete(row.categoryId)} color="error">
-        <DeleteForever />
-      </IconButton>
-    </>
-  ) : (
-    row[col.id]
-  )}
-</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                {categories
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => (
+                    <TableRow key={row.categoryId}>
+                      {columns.map((col) => (
+                        <TableCell key={col.id}>
+                          {col.id === 'actions' ? (
+                            <>
+                              <IconButton
+                                onClick={() => handleEdit(row.categoryId)}
+                                color="primary"
+                              >
+                                <Edit />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => handleDelete(row.categoryId)}
+                                color="error"
+                              >
+                                <DeleteForever />
+                              </IconButton>
+                            </>
+                          ) : (
+                            row[col.id]
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -676,7 +1027,11 @@ const Category = () => {
       {/* Add/Edit Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
         <DialogTitle>{editMode ? 'Edit Category' : 'Add Category'}</DialogTitle>
-        <Box component="form" onSubmit={editMode ? updateData : postData} sx={{ p: 3 }}>
+        <Box
+          component="form"
+          onSubmit={editMode ? updateData : postData}
+          sx={{ p: 3 }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField

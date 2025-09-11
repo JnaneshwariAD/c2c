@@ -1,106 +1,55 @@
-// src/views/Modules/ModuleCards.jsx
+// src/views/Module/ModuleCards.jsx
 import React from 'react';
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  TablePagination,
-  Box
-} from '@mui/material';
+import { Grid, Paper, Typography, Box, IconButton } from '@mui/material';
+import { Edit, DeleteForever } from '@mui/icons-material';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { BaseUrl } from 'BaseUrl';
 
-const ModuleCards = ({ modules, page, rowsPerPage, onEdit, onDelete, onPageChange, onRowsPerPageChange }) => {
-  const count = modules.length;
+const ModuleCards = ({ modules, page, rowsPerPage, handleEdit, handleDelete }) => {
+  const fileDownloadBase = `${BaseUrl}/file/downloadFile/?filePath=`;
 
   return (
-    <>
-      <Grid container spacing={2} mt={4}>
-        {modules
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((module) => (
-            <Grid item xs={12} sm={6} md={4} key={module.moduleId}>
-              <Card
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  transition: '0.3s',
-                  '&:hover': {
-                    boxShadow: 6,
-                    transform: 'translateY(-4px)',
-                  },
-                  height: '100%'
-                }}
-              >
-                <CardContent style={{textAlign: 'center'}}>
-                  <Typography
-                    variant="h4"
-                    sx={{ fontWeight: 'bold', mb: 1 }}
-                  >
-                    {module.moduleName}
-                  </Typography>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <strong>Subject:</strong> {module.subjectName}
-                  </Typography>
-
-                  <Typography variant="body2" sx={{ mb: 2 }}>
-                    {module.rawDescription?.substring(0, 100)}...
-                  </Typography>
-
-                  {module.filePath && (
-                    <Box sx={{ mb: 2, textAlign: 'center' }}>
-                      <Button
-                        href={`${BaseUrl}/file/downloadFile/?filePath=${module.filePath}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                      >
-                        Download PDF
-                      </Button>
-                    </Box>
-                  )}
-
-                  <Grid container spacing={1} justifyContent="center">
-                    <Grid item>
-                      <Button variant="outlined" size="small" onClick={() => onEdit(module.moduleId)}>
-                        View More
-                      </Button>
-                    </Grid>
-                    <Grid item>
-                      <Button variant="outlined" size="small" onClick={() => onEdit(module.moduleId)}>
-                        Edit
-                      </Button>
-                    </Grid>
-                    <Grid item>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={() => onDelete(module.moduleId)}
-                      >
-                        Delete
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-      </Grid>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={count}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-      />
-    </>
+    <Grid container spacing={2}>
+      {modules.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((m) => (
+        <Grid item xs={12} sm={6} md={4} key={m.moduleId}>
+          <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 3, height: '100%' }}>
+            <Typography variant="h6" gutterBottom>{m.moduleName}</Typography>
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-line', textAlign: 'justify' }}>
+              {m.description}
+            </Typography>
+            <Box mt={1}>
+              <Typography variant="caption" color="text.secondary">
+                Subject: {m.subjectName}
+              </Typography>
+            </Box>
+            {/* {m.filePath && (
+              <Box mt={1} display="flex" alignItems="center">
+                <PictureAsPdfIcon sx={{ color: 'red', mr: 1 }} />
+                <a
+                  href={fileDownloadBase + m.filePath}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ textDecoration: 'none', color: '#03045E' }}
+                >
+                  <Typography component="span" variant="body2">{m.fileName || 'View PDF'}</Typography>
+                </a>
+              </Box>
+            )} */}
+            <Box mt={2} display="flex" justifyContent="flex-end" gap={1}>
+              <IconButton color="primary" onClick={() => handleEdit(m)}>
+                <Edit />
+              </IconButton>
+              <IconButton color="error" onClick={() => handleDelete(m.moduleId)}>
+                <DeleteForever />
+              </IconButton>
+            </Box>
+          </Paper>
+        </Grid>
+      ))}
+      {modules.length === 0 && (
+        <Grid item xs={12}><Typography align="center">No modules</Typography></Grid>
+      )}
+    </Grid>
   );
 };
 

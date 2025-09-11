@@ -657,6 +657,7 @@ import ViewModuleIcon from '@mui/icons-material/ViewModule';
 
 const columns = [
   { id: 'index', label: 'ID' }, // Changed from 'courseId' to 'index'
+  // { id: 'courseId', label: 'Course ID', hide: true }, // Hidden column for courseId
   { id: 'courseName', label: 'Name', minWidth: 100 },
   { id: 'description', label: 'Description', minWidth: 100 },
   { id: 'noOfSem', label: 'No. of Semesters' },

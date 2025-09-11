@@ -842,10 +842,11 @@ import CollegeCards from './CollegeCards';
 
 const columns = [
   { id: 'serialNo', label: 'ID', align: 'center' },
+  // { id: 'collegeId', label: 'College ID', align: 'center' },
   { id: 'collegeName', label: 'Name', align: 'center' },
   { id: 'description', label: 'Description', minWidth: 100, align: 'center' },
   { id: 'universityName', label: 'University', align: 'center' },
-  { id: 'file', label: 'File', minWidth: 100, align: 'center' },
+  { id: 'file', label: 'Upload Logo', minWidth: 100, align: 'center' },
   { id: 'webUrl', label: 'Web URL', minWidth: 400, align: 'center' },
   { id: 'address', label: 'Address', minWidth: 200, align: 'center' },
   { id: 'city', label: 'City', align: 'center' },
@@ -1415,10 +1416,10 @@ const College = () => {
                 margin="normal"
                 fullWidth
                 id="collegePicName"
-                label="File Name"
+                label="Upload College Logo"
                 name="collegePicName"
                 autoComplete="collegePicName"
-                value={userdata.collegePicName}
+                value={userdata.collegeName}
                 disabled
                 helperText={errors.collegePicName}
                 error={!!errors.collegePicName}

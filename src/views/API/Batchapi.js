@@ -38,48 +38,92 @@ export const fetchBatchById = async (batchId, headers) => {
   });
 };
 
-
-
-
 export const updatedBatch = async (updatedData, headers) => {
-  return await axios({
-    method: 'PUT',
-    url: `${BaseUrl}/batch/v1/updateBatch`,
-    headers: headers,
-    data: updatedData
-  })
-    .then((res) => {
-      console.log(res);
-      if (res.data.responseCode === 201) {
-        Swal.fire('Success', res.data.message, 'success');
-      } else if (res.data.responseCode === 400) {
-        Swal.fire('Error', res.data.errorMessage, 'error');
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      Swal.fire('Error', error.message || 'Something went wrong', 'error');
+  try {
+    const res = await axios({
+      method: 'PUT',
+      url: `${BaseUrl}/batch/v1/updateBatch`,
+      headers,
+      data: updatedData
     });
+
+    if (res.data.responseCode === 201) {
+      Swal.fire('Success', res.data.message, 'success');
+    } else if (res.data.responseCode === 400) {
+      Swal.fire('Error', res.data.errorMessage, 'error');
+    }
+
+    return res.data; // <-- return data so caller can use it
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', error.message || 'Something went wrong', 'error');
+    return { responseCode: 500, errorMessage: error.message }; // optional fallback
+  }
 };
 
+
+
+// export const updatedBatch = async (updatedData, headers) => {
+//   return await axios({
+//     method: 'PUT',
+//     url: `${BaseUrl}/batch/v1/updateBatch`,
+//     headers: headers,
+//     data: updatedData
+//   })
+//     .then((res) => {
+//       console.log(res);
+//       if (res.data.responseCode === 201) {
+//         Swal.fire('Success', res.data.message, 'success');
+//       } else if (res.data.responseCode === 400) {
+//         Swal.fire('Error', res.data.errorMessage, 'error');
+//       }
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//       Swal.fire('Error', error.message || 'Something went wrong', 'error');
+//     });
+// };
+
+// export const addBatch = async (data, headers) => {
+//   try {
+//     return await axios({
+//       method: 'POST',
+//       url: `${BaseUrl}/batch/v1/createBatch`,
+//       headers,
+//       data: JSON.stringify(data)
+//     }).then((res) => {
+//       if (res.data.responseCode === 201) {
+//         Swal.fire('Success', res.data.message, 'success');
+//       } else if (res.data.responseCode === 400) {
+//         Swal.fire('Error', res.data.errorMessage, 'error');
+//       }
+//     });
+//   } catch (error) {
+//     Swal.fire('Error', error.message || 'Something went wrong', 'error');
+//   }
+// };
 export const addBatch = async (data, headers) => {
   try {
-    return await axios({
+    const res = await axios({
       method: 'POST',
       url: `${BaseUrl}/batch/v1/createBatch`,
       headers,
       data: JSON.stringify(data)
-    }).then((res) => {
-      if (res.data.responseCode === 201) {
-        Swal.fire('Success', res.data.message, 'success');
-      } else if (res.data.responseCode === 400) {
-        Swal.fire('Error', res.data.errorMessage, 'error');
-      }
     });
+
+    if (res.data.responseCode === 201) {
+      Swal.fire('Success', res.data.message, 'success');
+    } else if (res.data.responseCode === 400) {
+      Swal.fire('Error', res.data.errorMessage, 'error');
+    }
+
+    return res.data;          // <<< return the data here
   } catch (error) {
     Swal.fire('Error', error.message || 'Something went wrong', 'error');
+    return { responseCode: 500, errorMessage: error.message };
   }
 };
+
 
 export const deleteBatch = async (id, headers) => {
   return await axios({
